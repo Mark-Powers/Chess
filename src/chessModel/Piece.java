@@ -1,3 +1,4 @@
+package chessModel;
 public abstract class Piece
 {
     int x;

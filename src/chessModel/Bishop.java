@@ -1,7 +1,8 @@
+package chessModel;
 
-public class Queen extends Piece
+public class Bishop extends Piece
 {
-    public Queen(int x, int y, int side)
+    public Bishop(int x, int y, int side)
     {
         this.x = x;
         this.y = y;
@@ -9,11 +10,11 @@ public class Queen extends Piece
     }
     public String getChar(){
         if(side==0)
-            return "Q";
-        return "q";
+            return "B";
+        return "b";
     }
     public boolean validMove(int x, int y, boolean isEnemy){
-        if( ( this.x==x || this.y==y ) || (Math.abs(this.x-x) == Math.abs(this.y-y)) ){
+        if((Math.abs(this.x-x) == Math.abs(this.y-y))){
             return true;
         }
         return false;

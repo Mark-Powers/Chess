@@ -1,9 +1,11 @@
+package chessModel;
 import java.util.ArrayList;
 public class Board
 {
-    int boardWidth;
-    int boardHeight;
-    ArrayList<Piece> pieces = new ArrayList<Piece>();
+    public int boardWidth;
+    public int boardHeight;
+    private ArrayList<Piece> pieces = new ArrayList<Piece>();
+    
     public Board(){
         boardWidth = 8;
         boardHeight = 8;
@@ -115,5 +117,18 @@ public class Board
     }
     public void print(String s){
         System.out.print(s);
+    }
+    
+    public ArrayList<Piece> getPieces(){
+    	return pieces;
+    }
+    
+    public Piece getPiece(int x, int y){
+    	for (Piece piece:pieces){
+    		if (x==piece.x&&y==piece.y){
+    			return piece;
+    		}
+    	}
+    	return null;
     }
 }

@@ -1,3 +1,4 @@
+package chessModel;
 import java.util.Scanner;
 
 public class Tester
@@ -6,12 +7,12 @@ public class Tester
         Scanner in = new Scanner(System.in);
         Board b = new Board();
         
-        /*
+        
         b.move(1,0,3,0);
         b.move(6,0,4,0);
         b.move(3,0,4,0);
         b.move(4,0,5,0);
-        */
+        
         
         while(true){
             int x = in.nextInt();
