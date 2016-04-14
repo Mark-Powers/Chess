@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -28,6 +29,7 @@ public class GUI extends JFrame {
 	private JPanel inputPanel;
 	private JTextField inputField;
 	private JEditorPane view;
+	private HashMap<String,String> charMap;
 	
 	public static void main(String args[]){
 		new GUI();
@@ -41,6 +43,22 @@ public class GUI extends JFrame {
 		this.setLayout(new BorderLayout());
 		
 		b = new Board();
+		charMap = new HashMap<String,String>();
+		
+		charMap.put("K", "&#9812;");
+		charMap.put("Q", "&#9813;");
+		charMap.put("R", "&#9814;");
+		charMap.put("B", "&#9815;");
+		charMap.put("N", "&#9816;");
+		charMap.put("P", "&#9817;");
+		
+		charMap.put("k", "&#9818;");
+		charMap.put("q", "&#9819;");
+		charMap.put("r", "&#9820;");
+		charMap.put("b", "&#9821;");
+		charMap.put("n", "&#9822;");
+		charMap.put("p", "&#9823;");
+		
 		viewPanel = new JPanel();
 		inputPanel = new JPanel();
 		viewPanel.setLayout(new FlowLayout());
@@ -81,7 +99,9 @@ public class GUI extends JFrame {
 		// style stuff
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet style = kit.getStyleSheet();
-		style.addRule("td{text-align:center;width:20px;height:20px; border: 1px solid gray;}");
+		style.addRule("td{text-align:center;width:30px;height:30px;}");
+		style.addRule("body{font-family:sans-serif;font-size:15px;}");
+		style.addRule(".dark{background:#DDDDDD;}");
 		kit.setStyleSheet(style);
 		view.setEditorKit(kit);
 		
@@ -93,21 +113,41 @@ public class GUI extends JFrame {
 
 	private void updateView() {
 		StringBuilder html = new StringBuilder();
-		html.append("<table>");
+		html.append("<table cellspacing='0'>");
+		boolean parity = false;
 		for (int x = 0; x < b.boardWidth; x++) {
 			html.append("<tr>");
 			for (int y = 0; y < b.boardHeight; y++) {
 				Piece p = b.getPiece(x,y);
-				if (p==null){
-					html.append("<td></td>");
-				} else {
-					html.append("<td>"+p.getChar()+"</td>");
+				String parityClass = "";
+				if (parity){
+					parityClass = "class = \"dark\"";
 				}
-				
+				if (p==null){
+					html.append("<td "+ parityClass +"></td>");
+				} else {
+					String unicodeChar = converChar(p.getChar());
+					html.append("<td "+ parityClass +">"+ unicodeChar +"</td>");
+				}
+				parity = !parity;
 			}
-			html.append("<tr>");
+			
+			// if even board alternate
+			if (b.boardWidth%2 == 0){
+				parity = !parity;
+			}
+			
+			html.append("</tr>");
 		}
 		html.append("</table>");
 		view.setText(html.toString());
+	}
+
+	private String converChar(String key) {
+		String unicodeChar = charMap.get(key);
+		if (unicodeChar == null){
+			return key;
+		}
+		return unicodeChar;
 	}
 }
