@@ -29,7 +29,7 @@ public class Board
         pieces.add(new Queen(7,3,1));
         pieces.add(new King(0,4,0));
         pieces.add(new King(7,4,1));
-        display();
+        //display();
     }
     public void move(int oldX, int oldY, int x, int y){
         boolean isEnemy = false;
@@ -60,7 +60,7 @@ public class Board
                 }
             }
         }
-        display(); // REWRITES BOARD
+        //display(); // REWRITES BOARD
     }
      public void display(){
         print(getBoard());
