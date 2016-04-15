@@ -1,3 +1,4 @@
+package chessModel;
 
 public class Knight extends Piece
 {

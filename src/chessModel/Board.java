@@ -1,9 +1,12 @@
+package chessModel;
 import java.util.ArrayList;
 public class Board
 {
-    int boardWidth;
-    int boardHeight;
-    ArrayList<Piece> pieces = new ArrayList<Piece>();
+    public int boardWidth;
+    public int boardHeight;
+    private ArrayList<Piece> pieces = new ArrayList<Piece>();
+    private ArrayList<Integer[]> movelog;
+    
     public Board(){
         boardWidth = 8;
         boardHeight = 8;
@@ -27,7 +30,8 @@ public class Board
         pieces.add(new Queen(7,3,1));
         pieces.add(new King(0,4,0));
         pieces.add(new King(7,4,1));
-        display();
+        //display();
+        movelog = new ArrayList<Integer[]>();
     }
     public void move(int oldX, int oldY, int x, int y){
         boolean isEnemy = false;
@@ -56,9 +60,15 @@ public class Board
                          pieceIndex--;
                     }
                 }
+                Integer[] numsForLog = new Integer[4];
+                numsForLog[0] = oldX;
+                numsForLog[1] = oldY;
+                numsForLog[2] = x;
+                numsForLog[3] = y;
+                movelog.add(numsForLog);
             }
         }
-        display(); // REWRITES BOARD
+        //display(); // REWRITES BOARD
     }
      public void display(){
         print(getBoard());
@@ -115,5 +125,22 @@ public class Board
     }
     public void print(String s){
         System.out.print(s);
+    }
+    
+    public ArrayList<Piece> getPieces(){
+    	return pieces;
+    }
+    
+    public Piece getPiece(int x, int y){
+    	for (Piece piece:pieces){
+    		if (x==piece.x&&y==piece.y){
+    			return piece;
+    		}
+    	}
+    	return null;
+    }
+    
+    public ArrayList<Integer[]> getMoveLog(){
+    	return movelog;
     }
 }

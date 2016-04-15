@@ -1,3 +1,4 @@
+package chessModel;
 public class Rook extends Piece
 {
     public Rook(int x, int y, int side)
