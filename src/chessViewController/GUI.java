@@ -6,14 +6,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -37,6 +45,9 @@ public class GUI extends JFrame {
 	private int selectX;
 	private static String darkClass = "class = \"dark\"";
 	private static String selectedClass = "class = \"select\"";
+	private JMenuBar menu;
+	private JMenu file;
+	private JMenuItem save;
 
 	public static void main(String args[]) {
 		new GUI();
@@ -47,7 +58,49 @@ public class GUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 
+		// Set to the native look and feel
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			System.out.println("Could not find native look and feel.");
+		}
+
 		this.setLayout(new BorderLayout());
+
+		menu = new JMenuBar();
+		file = new JMenu("File");
+		save = new JMenuItem("Save...");
+		menu.add(file);
+		file.add(save);
+
+		this.setJMenuBar(menu);
+
+		save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				File f = new File("C:/CHESSLOGS");
+				fc.setFileFilter(new FileNameExtensionFilter("Text File","txt"));
+				f.mkdirs();
+				fc.setCurrentDirectory(f);
+				fc.showSaveDialog(fc.getParent());
+				try {
+					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
+					StringBuilder log = new StringBuilder();
+					for (Integer[] nums : b.getMoveLog()) {
+						for (int i = 0; i < nums.length; i++) {
+							log.append(nums[i]);
+						}
+						log.append("\r\n");
+					}
+					pw.write(log.toString());
+					pw.close();
+				} catch (FileNotFoundException e1) {
+					JOptionPane.showMessageDialog(null, "Unable to write file");
+				}
+			}
+		});
 
 		// -1 means nothing is selected
 		selectX = -1;
@@ -102,7 +155,7 @@ public class GUI extends JFrame {
 					inputField.requestFocus();
 				} catch (Exception exc) {
 					// was unable to parse the input
-					JOptionPane.showInputDialog(null, "Invalid format.");
+					JOptionPane.showMessageDialog(null, "Invalid format.");
 				}
 				deselect();
 			}
@@ -113,20 +166,20 @@ public class GUI extends JFrame {
 			public void mouseReleased(MouseEvent e) {
 				int newSelectX = (e.getY() - 5) / 50;
 				int newSelectY = (e.getX() - 5) / 50;
-				
+
 				// unselects if is the same point or
 				// blank space
-				boolean blankSpace = b.getPiece(newSelectX,newSelectY)==null;
+				boolean blankSpace = b.getPiece(newSelectX, newSelectY) == null;
 				boolean noneSelected = (selectX == -1) && (selectY == -1);
-				if ((newSelectX == selectX && newSelectY == selectY) || (blankSpace && noneSelected)){
+				if ((newSelectX == selectX && newSelectY == selectY) || (blankSpace && noneSelected)) {
 					inputField.setText("");
-					
+
 					// deselect
 					deselect();
-					
+
 					return;
 				}
-				
+
 				selectX = newSelectX;
 				selectY = newSelectY;
 				if (inputField.getText().trim().isEmpty()) {

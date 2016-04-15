@@ -5,6 +5,7 @@ public class Board
     public int boardWidth;
     public int boardHeight;
     private ArrayList<Piece> pieces = new ArrayList<Piece>();
+    private ArrayList<Integer[]> movelog;
     
     public Board(){
         boardWidth = 8;
@@ -30,6 +31,7 @@ public class Board
         pieces.add(new King(0,4,0));
         pieces.add(new King(7,4,1));
         //display();
+        movelog = new ArrayList<Integer[]>();
     }
     public void move(int oldX, int oldY, int x, int y){
         boolean isEnemy = false;
@@ -58,6 +60,12 @@ public class Board
                          pieceIndex--;
                     }
                 }
+                Integer[] numsForLog = new Integer[4];
+                numsForLog[0] = oldX;
+                numsForLog[1] = oldY;
+                numsForLog[2] = x;
+                numsForLog[3] = y;
+                movelog.add(numsForLog);
             }
         }
         //display(); // REWRITES BOARD
@@ -130,5 +138,9 @@ public class Board
     		}
     	}
     	return null;
+    }
+    
+    public ArrayList<Integer[]> getMoveLog(){
+    	return movelog;
     }
 }
