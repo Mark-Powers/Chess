@@ -13,7 +13,7 @@ public class Queen extends Piece
             return "Q";
         return "q";
     }
-    public boolean validMove(int x, int y, boolean isEnemy){
+    public boolean validMove(int x, int y, SquareStatus status){
         if( ( this.x==x || this.y==y ) || (Math.abs(this.x-x) == Math.abs(this.y-y)) ){
             return true;
         }

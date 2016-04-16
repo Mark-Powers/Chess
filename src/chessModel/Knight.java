@@ -13,4 +13,7 @@ public class Knight extends Piece
             return "N";
         return "n";
     }
+    public boolean validMove(int x, int y, SquareStatus status){
+    	return true;
+    }
 }

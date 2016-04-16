@@ -12,11 +12,12 @@ public class Pawn extends Piece
             return "P";
         return "p";
     }
-    public boolean validMove(int x2, int y2, boolean isEnemy){
-        if( (side==0 && ( (!isEnemy && ((this.x==1 && x2==3) || (this.x+1==x2))) || (isEnemy && (this.x+1==x2) && (this.y+1==y2 || this.y-1==y2)))) || 
-            (side==1 && ( (!isEnemy && ((this.x==6 && x2==4) || (this.x-1==x2))) || (isEnemy && (this.x-1==x2) && (this.y-1==y2 || this.y+1==y2))))){
+    // TODO Fix this
+    public boolean validMove(int x2, int y2, SquareStatus status){
+        //if( (side==0 && ( (!isEnemy && ((this.x==1 && x2==3) || (this.x+1==x2))) || (isEnemy && (this.x+1==x2) && (this.y+1==y2 || this.y-1==y2)))) || 
+        //   (side==1 && ( (!isEnemy && ((this.x==6 && x2==4) || (this.x-1==x2))) || (isEnemy && (this.x-1==x2) && (this.y-1==y2 || this.y+1==y2))))){
             return true;
-        }
-        return false;
+        //}
+        //return false;
     }
 }
