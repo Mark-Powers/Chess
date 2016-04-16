@@ -68,6 +68,30 @@ public class Board {
 				movelog.add(numsForLog);
 			}
 		}
+	}
+
+	public boolean isObstructed(Piece p, int x, int y) {
+		// Must be up/down/left/right
+		if (p.getX() == x) {
+			int dir = y-p.getY();
+			for(int tmpY = p.getY()+dir; tmpY<y; y+=dir){
+				if(getPiece(x, tmpY)!=null){
+					return true;
+				}
+			}
+		}
+		if (p.getY() == y) {
+			int dir = x-p.getX();
+			for(int tmpX = p.getX()+dir; tmpX<x; x+=dir){
+				if(getPiece(tmpX, y)!=null){
+					return true;
+				}
+			}
+		}
+		// Change in x == Change in y (diagonal movement)
+		if (Math.abs(p.getX() - x) == Math.abs(p.getY() - y)) {
+			//TODO finish implementation
+			
 		}
 		// Otherwise it must be fine
 		return false;
