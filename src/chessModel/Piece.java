@@ -19,4 +19,12 @@ public abstract class Piece
     public String toString(){
         return "x = "+x+"\ny = "+y +"\n";
     }
+    
+    public int getX() {
+		return x;
+	}
+    
+	public int getY() {
+		return y;
+	}
 }
