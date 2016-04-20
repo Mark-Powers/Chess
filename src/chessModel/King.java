@@ -14,9 +14,6 @@ public class King extends Piece
         return "k";
     }
     public boolean validMove(int x, int y, SquareStatus status){
-        if(Math.abs(this.x-x)<1 && Math.abs(this.y-y)<1){
-            return true;
-        }
-        return false;
+        return (Math.abs(this.x-x)<=1 && Math.abs(this.y-y)<=1);
     }
 }

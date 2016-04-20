@@ -14,6 +14,8 @@ public class Knight extends Piece
         return "n";
     }
     public boolean validMove(int x, int y, SquareStatus status){
-    	return true;
+    	int xDiff = Math.abs(x-this.x);
+    	int yDiff = Math.abs(y-this.y);
+    	return (xDiff != 3 && yDiff != 3 && (xDiff+yDiff)==3);
     }
 }

@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class Board {
 	public int boardWidth;
 	public int boardHeight;
+	public int currentTeamNo;
 	private ArrayList<Piece> pieces = new ArrayList<Piece>();
 	private ArrayList<Integer[]> movelog;
 
 	public Board() {
+		currentTeamNo = 0;
 		boardWidth = 8;
 		boardHeight = 8;
 		for (int i = 0; i < 8; i++) {
@@ -43,7 +45,7 @@ public class Board {
 
 		if (selectedP != null) {
 			otherP = getPiece(x, y);
-			if (otherP != selectedP) {
+			if (otherP != null && otherP != selectedP) {
 				if (otherP.getSide() == selectedP.getSide()) {
 					status = SquareStatus.TEAM;
 				}
@@ -52,9 +54,10 @@ public class Board {
 				}
 			}
 
-			if (!status.equals(SquareStatus.TEAM)
-					&& !isObstructed(selectedP, x, y)
-					&& selectedP.validMove(x, y, status)) {
+			if (currentTeamNo == selectedP.getSide()
+					&& !status.equals(SquareStatus.TEAM)
+					&& selectedP.validMove(x, y, status)
+					&& !isObstructed(selectedP, x, y)) {
 				selectedP.setX(x);
 				selectedP.setY(y);
 				if (status.equals(SquareStatus.ENEMY)) {
@@ -66,31 +69,43 @@ public class Board {
 				numsForLog[2] = x;
 				numsForLog[3] = y;
 				movelog.add(numsForLog);
+				currentTeamNo = currentTeamNo == 0 ? 1 : 0;
 			}
 		}
 	}
 
 	public boolean isObstructed(Piece p, int x, int y) {
-		// Must be up/down/left/right
+		// Must be left/right
 		if (p.getX() == x) {
-			int dir = y-p.getY();
-			for(int tmpY = p.getY()+dir; tmpY<y; y+=dir){
-				if(getPiece(x, tmpY)!=null){
+			int dir = y > p.getY() ? 1 : -1;
+			for (int tmpY = p.getY() + dir; tmpY != y; tmpY += dir) {
+				if (getPiece(x, tmpY) != null) {
 					return true;
 				}
 			}
 		}
+		// must be up down
 		if (p.getY() == y) {
-			int dir = x-p.getX();
-			for(int tmpX = p.getX()+dir; tmpX<x; x+=dir){
-				if(getPiece(tmpX, y)!=null){
+			int dir = x > p.getX() ? 1 : -1;
+			for (int tmpX = p.getX() + dir;  tmpX != x; tmpX += dir) {
+				if (getPiece(tmpX, y) != null) {
 					return true;
 				}
 			}
 		}
 		// Change in x == Change in y (diagonal movement)
 		if (Math.abs(p.getX() - x) == Math.abs(p.getY() - y)) {
-			//TODO finish implementation
+			int dirY = y > p.getY() ? 1 : -1;
+			int dirX = x > p.getX() ? 1 : -1;
+			int tmpY = p.getY() + dirY;
+			int tmpX = p.getX() + dirX;
+			while(tmpX != x && tmpY != y) {
+				if (getPiece(tmpX, tmpY) != null) {
+					return true;
+				}
+				tmpX += dirX; 
+				tmpY +=dirY;
+			}
 			
 		}
 		// Otherwise it must be fine
