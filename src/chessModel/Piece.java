@@ -4,7 +4,8 @@ public abstract class Piece
     protected int x;
     protected int y;
     protected int side;
-    
+    public abstract String getChar();
+    public abstract boolean validMove(int x, int y, SquareStatus status);
     
     public void setX(int x){
         this.x = x;
@@ -21,6 +22,6 @@ public abstract class Piece
     public int getSide(){
     	return side;
     }
-    public abstract String getChar();
-    public abstract boolean validMove(int x, int y, SquareStatus status);
+	
+    
 }
