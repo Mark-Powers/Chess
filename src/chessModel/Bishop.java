@@ -13,10 +13,7 @@ public class Bishop extends Piece
             return "B";
         return "b";
     }
-    public boolean validMove(int x, int y, boolean isEnemy){
-        if((Math.abs(this.x-x) == Math.abs(this.y-y))){
-            return true;
-        }
-        return false;
+    public boolean validMove(int x, int y, SquareStatus status){
+        return ((Math.abs(this.x-x) == Math.abs(this.y-y)));
     }
 }
