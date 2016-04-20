@@ -64,8 +64,7 @@ public class GraphicsGUI extends JFrame {
 		this.add(inputField, BorderLayout.SOUTH);
 		this.add(chessView, BorderLayout.CENTER);
 		pack();
-		this.setSize(chessView.getSize());
-		pack();
+		this.setSize(getWidth(),(int) chessView.getSize().getHeight());
 
 
 		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
@@ -144,7 +143,6 @@ public class GraphicsGUI extends JFrame {
 					inputField.requestFocus();
 				} catch (Exception exc) {
 					// was unable to parse the input
-					exc.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Invalid format.");
 				}
 			}

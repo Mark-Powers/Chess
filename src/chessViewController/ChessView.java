@@ -104,7 +104,6 @@ public class ChessView extends JPanel {
 	
 	public Dimension getSize(){
 		int cellSize = getCellSize();
-		System.out.println(cellSize);
 		return new Dimension(cellSize*b.boardWidth,cellSize*b.boardHeight);
 	}
 }
