@@ -91,11 +91,7 @@ public class ChessView extends JPanel {
 	}
 
 	public int getCellSize() {
-		int cellSize = getWidth() / b.boardWidth;
-		if (getWidth() > getHeight()){
-			cellSize = getHeight() / b.boardHeight;
-		}
-		return cellSize;
+		return getHeight()/b.boardHeight;
 	}
 
 	private String convertChar(String key) {

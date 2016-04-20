@@ -32,13 +32,9 @@ public class GraphicsGUI extends JFrame {
 	private ChessView chessView;
 	private JTextField inputField;
 
-	public static void main(String args[]) {
-		new GraphicsGUI();
-	}
-
-	public GraphicsGUI() {
-		this.setResizable(true);
-		this.setMinimumSize(new Dimension(480, 640));
+	public GraphicsGUI(Board board) {
+		this.setResizable(false);
+		this.setMinimumSize(new Dimension(500,500));
 
 		setVisible(true);
 
@@ -59,7 +55,7 @@ public class GraphicsGUI extends JFrame {
 
 		this.setJMenuBar(menu);
 
-		b = new Board();
+		b = board;
 
 		chessView = new ChessView(b);
 
@@ -68,8 +64,7 @@ public class GraphicsGUI extends JFrame {
 		this.add(inputField, BorderLayout.SOUTH);
 		this.add(chessView, BorderLayout.CENTER);
 		pack();
-		System.out.println(chessView.getSize());
-		this.setMinimumSize(chessView.getSize());
+		this.setSize(chessView.getSize());
 		pack();
 
 
