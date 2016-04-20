@@ -13,10 +13,7 @@ public class King extends Piece
             return "K";
         return "k";
     }
-    public boolean validMove(int x, int y, boolean isEnemy){
-        if(Math.abs(this.x-x)<1 && Math.abs(this.y-y)<1){
-            return true;
-        }
-        return false;
+    public boolean validMove(int x, int y, SquareStatus status){
+        return (Math.abs(this.x-x)<=1 && Math.abs(this.y-y)<=1);
     }
 }

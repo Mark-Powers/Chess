@@ -77,11 +77,11 @@ public class GUI extends JFrame {
 
 		save.addActionListener(new ActionListener() {
 
-			@Override
+			//@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = new JFileChooser();
 				File f = new File("C:/CHESSLOGS");
-				fc.setFileFilter(new FileNameExtensionFilter("Text File","txt"));
+				fc.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
 				f.mkdirs();
 				fc.setCurrentDirectory(f);
 				fc.showSaveDialog(fc.getParent());
@@ -139,7 +139,7 @@ public class GUI extends JFrame {
 		// handle enter key
 		inputField.addActionListener(new ActionListener() {
 
-			@Override
+			//@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					// use each character as input to a board move
@@ -171,7 +171,8 @@ public class GUI extends JFrame {
 				// blank space
 				boolean blankSpace = b.getPiece(newSelectX, newSelectY) == null;
 				boolean noneSelected = (selectX == -1) && (selectY == -1);
-				if ((newSelectX == selectX && newSelectY == selectY) || (blankSpace && noneSelected)) {
+				if ((newSelectX == selectX && newSelectY == selectY)
+						|| (blankSpace && noneSelected)) {
 					inputField.setText("");
 
 					// deselect
@@ -183,9 +184,12 @@ public class GUI extends JFrame {
 				selectX = newSelectX;
 				selectY = newSelectY;
 				if (inputField.getText().trim().isEmpty()) {
-					inputField.setText(Integer.toString(selectX) + Integer.toString(selectY));
+					inputField.setText(Integer.toString(selectX)
+							+ Integer.toString(selectY));
 				} else if (inputField.getText().length() == 2) {
-					inputField.setText(inputField.getText() + Integer.toString(selectX) + Integer.toString(selectY));
+					inputField.setText(inputField.getText()
+							+ Integer.toString(selectX)
+							+ Integer.toString(selectY));
 					inputField.postActionEvent();
 					deselect();
 				}
@@ -195,7 +199,8 @@ public class GUI extends JFrame {
 		// style stuff
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet style = kit.getStyleSheet();
-		style.addRule("td{text-align:center;width:" + SQUARESIZE + "px;height:" + SQUARESIZE + "px;}");
+		style.addRule("td{text-align:center;width:" + SQUARESIZE + "px;height:"
+				+ SQUARESIZE + "px;}");
 		style.addRule("body{font-family:sans-serif;font-size:15px;}");
 		style.addRule(".dark{background:#DDDDDD;}");
 		style.addRule(".select{background:#99CCDD;}");
@@ -217,10 +222,12 @@ public class GUI extends JFrame {
 			for (int y = 0; y < b.boardHeight; y++) {
 				Piece p = b.getPiece(x, y);
 				if (p == null) {
-					html.append("<td " + getBackgroundClass(parity, x, y) + "></td>");
+					html.append("<td " + getBackgroundClass(parity, x, y)
+							+ "></td>");
 				} else {
 					String unicodeChar = convertChar(p.getChar());
-					html.append("<td " + getBackgroundClass(parity, x, y) + ">" + unicodeChar + "</td>");
+					html.append("<td " + getBackgroundClass(parity, x, y) + ">"
+							+ unicodeChar + "</td>");
 				}
 				parity = !parity;
 			}
