@@ -8,32 +8,68 @@ public class Board {
 	public int currentTeamNo;
 	private ArrayList<Piece> pieces = new ArrayList<Piece>();
 	private ArrayList<Integer[]> movelog;
+	public static final int STANDARD = 1;
+	public static final int SPEEDCHESS = 2;
 
-	public Board() {
+	public Board (){
+		this(STANDARD);
+	}
+	
+	public Board(int config) {
 		currentTeamNo = 0;
 		boardWidth = 8;
 		boardHeight = 8;
-		for (int i = 0; i < 8; i++) {
-			pieces.add(new Pawn(1, i, 0));
-			pieces.add(new Pawn(6, i, 1));
-		}
-		pieces.add(new Rook(0, 0, 0));
-		pieces.add(new Rook(0, 7, 0));
-		pieces.add(new Rook(7, 0, 1));
-		pieces.add(new Rook(7, 7, 1));
-		pieces.add(new Knight(0, 1, 0));
-		pieces.add(new Knight(0, 6, 0));
-		pieces.add(new Knight(7, 1, 1));
-		pieces.add(new Knight(7, 6, 1));
-		pieces.add(new Bishop(0, 2, 0));
-		pieces.add(new Bishop(0, 5, 0));
-		pieces.add(new Bishop(7, 2, 1));
-		pieces.add(new Bishop(7, 5, 1));
-		pieces.add(new Queen(0, 3, 0));
-		pieces.add(new Queen(7, 3, 1));
-		pieces.add(new King(0, 4, 0));
-		pieces.add(new King(7, 4, 1));
+		
+		initPieces(config);
 		movelog = new ArrayList<Integer[]>();
+	}
+
+	private void initPieces(int config) {
+		switch (config) {
+		case 1:
+			pieces.add(new Rook(0, 0, 0));
+			pieces.add(new Rook(0, 7, 0));
+			pieces.add(new Rook(7, 0, 1));
+			pieces.add(new Rook(7, 7, 1));
+			pieces.add(new Knight(0, 1, 0));
+			pieces.add(new Knight(0, 6, 0));
+			pieces.add(new Knight(7, 1, 1));
+			pieces.add(new Knight(7, 6, 1));
+			pieces.add(new Bishop(0, 2, 0));
+			pieces.add(new Bishop(0, 5, 0));
+			pieces.add(new Bishop(7, 2, 1));
+			pieces.add(new Bishop(7, 5, 1));
+			pieces.add(new Queen(0, 3, 0));
+			pieces.add(new Queen(7, 3, 1));
+			pieces.add(new King(0, 4, 0));
+			pieces.add(new King(7, 4, 1));
+			for (int i = 0; i < 8; i++) {
+				pieces.add(new Pawn(1, i, 0));
+				pieces.add(new Pawn(6, i, 1));
+			}
+			break;
+		case 2:
+			boardWidth = 5;
+			boardHeight = 6;
+			pieces.add(new Queen(0, 0, 0));
+			pieces.add(new King(0, 1, 0));
+			pieces.add(new Bishop(0, 2, 0));
+			pieces.add(new Knight(0, 3, 0));
+			pieces.add(new Rook(0, 4, 0));
+			pieces.add(new Queen(5, 4, 1));
+			pieces.add(new King(5, 3, 1));
+			pieces.add(new Bishop(5, 2, 1));
+			pieces.add(new Knight(5, 1, 1));
+			pieces.add(new Rook(5, 0, 1));
+			for (int i = 0; i < 8; i++) {
+				pieces.add(new Pawn(1, i, 0));
+				pieces.add(new Pawn(4, i, 1));
+			}
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	public void move(int oldX, int oldY, int x, int y) {
@@ -54,10 +90,8 @@ public class Board {
 				}
 			}
 
-			if (currentTeamNo == selectedP.getSide()
-					&& !status.equals(SquareStatus.TEAM)
-					&& selectedP.validMove(x, y, status)
-					&& !isObstructed(selectedP, x, y)) {
+			if (currentTeamNo == selectedP.getSide() && !status.equals(SquareStatus.TEAM)
+					&& selectedP.validMove(x, y, status) && !isObstructed(selectedP, x, y)) {
 				selectedP.setX(x);
 				selectedP.setY(y);
 				if (status.equals(SquareStatus.ENEMY)) {
@@ -87,7 +121,7 @@ public class Board {
 		// must be up down
 		if (p.getY() == y) {
 			int dir = x > p.getX() ? 1 : -1;
-			for (int tmpX = p.getX() + dir;  tmpX != x; tmpX += dir) {
+			for (int tmpX = p.getX() + dir; tmpX != x; tmpX += dir) {
 				if (getPiece(tmpX, y) != null) {
 					return true;
 				}
@@ -99,14 +133,14 @@ public class Board {
 			int dirX = x > p.getX() ? 1 : -1;
 			int tmpY = p.getY() + dirY;
 			int tmpX = p.getX() + dirX;
-			while(tmpX != x && tmpY != y) {
+			while (tmpX != x && tmpY != y) {
 				if (getPiece(tmpX, tmpY) != null) {
 					return true;
 				}
-				tmpX += dirX; 
-				tmpY +=dirY;
+				tmpX += dirX;
+				tmpY += dirY;
 			}
-			
+
 		}
 		// Otherwise it must be fine
 		return false;
@@ -132,8 +166,7 @@ public class Board {
 					}
 				}
 				if (!wasPrinted) {
-					if ((i % 2 == 0 && u % 2 == 0)
-							|| (i % 2 != 0 && u % 2 != 0))
+					if ((i % 2 == 0 && u % 2 == 0) || (i % 2 != 0 && u % 2 != 0))
 						board += ("O");
 					else
 						board += ("O");

@@ -1,6 +1,7 @@
 package chessViewController;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -103,5 +104,11 @@ public class ChessView extends JPanel {
 			return key;
 		}
 		return Character.toString(c);
+	}
+	
+	public Dimension getSize(){
+		int cellSize = getCellSize();
+		System.out.println(cellSize);
+		return new Dimension(cellSize*b.boardWidth,cellSize*b.boardHeight);
 	}
 }

@@ -37,8 +37,8 @@ public class GraphicsGUI extends JFrame {
 	}
 
 	public GraphicsGUI() {
-		// this.setResizable(false);
-		this.setMinimumSize(new Dimension(300, 300));
+		this.setResizable(true);
+		this.setMinimumSize(new Dimension(480, 640));
 
 		setVisible(true);
 
@@ -64,12 +64,14 @@ public class GraphicsGUI extends JFrame {
 		chessView = new ChessView(b);
 
 		inputField = new JTextField(10);
+		
 		this.add(inputField, BorderLayout.SOUTH);
 		this.add(chessView, BorderLayout.CENTER);
-
+		pack();
+		System.out.println(chessView.getSize());
+		this.setMinimumSize(chessView.getSize());
 		pack();
 
-		this.setSize(424, 500);
 
 		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
