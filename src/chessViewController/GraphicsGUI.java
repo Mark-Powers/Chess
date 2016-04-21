@@ -2,6 +2,7 @@ package chessViewController;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,25 +14,32 @@ import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
+import chessModel.Game;
 import chessModel.Piece;
 
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
 	private JMenuItem save;
-	private Board b;
+	private Game g;
 	private ChessView chessView;
-	private JTextField inputField;
-
+	JLabel timer1Label;
+	JLabel timer2Label;
+	JLabel player1Score;
+	JLabel player2Score;
+	
 	public static void main(String args[]) {
 		new GraphicsGUI();
 	}
@@ -58,13 +66,37 @@ public class GraphicsGUI extends JFrame {
 		file.add(save);
 
 		this.setJMenuBar(menu);
-
-		b = new Board();
+		
+		g = new Game();
+		Board b = g.getBoard();
 
 		chessView = new ChessView(b);
-
-		inputField = new JTextField(10);
-		this.add(inputField, BorderLayout.SOUTH);
+		
+		
+		// Timer/Score area stuff
+		timer1Label = new JLabel("", SwingConstants.CENTER);
+		timer2Label = new JLabel("", SwingConstants.CENTER);
+		player1Score= new JLabel("", SwingConstants.CENTER);
+		player2Score= new JLabel("", SwingConstants.CENTER);
+		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10 times a second
+			public void actionPerformed(ActionEvent e) {
+				timer1Label.setText("P1 Time: "+g.getPlayer1Time());
+				timer2Label.setText("P2 Time: "+g.getPlayer2Time());
+				player1Score.setText("Score: "+g.getPlayer1Score());
+				player2Score.setText("Score: "+g.getPlayer2Score());
+				// TODO CHECK FOR GAMEOVER
+			}
+		});
+		updateTimer.start();
+		JPanel timerScorePanel = new JPanel();
+		timerScorePanel.setLayout(new GridLayout(1, 4));
+		timerScorePanel.add(timer1Label);
+		timerScorePanel.add(player1Score);
+		timerScorePanel.add(player2Score);
+		timerScorePanel.add(timer2Label);
+		this.add(timerScorePanel, BorderLayout.SOUTH);
+		
+		
 		this.add(chessView, BorderLayout.CENTER);
 
 		pack();
@@ -75,8 +107,6 @@ public class GraphicsGUI extends JFrame {
 		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
 				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		inputField.requestFocus();
 
 		save.addActionListener(new ActionListener() {
 
@@ -91,7 +121,7 @@ public class GraphicsGUI extends JFrame {
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					StringBuilder log = new StringBuilder();
-					for (Integer[] nums : b.getMoveLog()) {
+					for (Integer[] nums : g.getBoard().getMoveLog()) {
 						for (int i = 0; i < nums.length; i++) {
 							log.append(nums[i]);
 						}
@@ -111,11 +141,11 @@ public class GraphicsGUI extends JFrame {
 				int xLoc = (e.getY()) / cellSize;
 				int yLoc = (e.getX()) / cellSize;
 				if (chessView.getSelected() != null) {
-					b.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
+					g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
 					chessView.setSelected(null);
 					chessView.repaint();
 				} else {
-					Piece p = b.getPiece(xLoc, yLoc);
+					Piece p = g.getBoard().getPiece(xLoc, yLoc);
 					if (p == null) {
 						chessView.setSelected(null);
 					} else if (p.equals(chessView.getSelected())) {
@@ -128,29 +158,6 @@ public class GraphicsGUI extends JFrame {
 			}
 		});
 
-		// handle enter key
-		inputField.addActionListener(new ActionListener() {
-
-			// @Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					// use each character as input to a board move
-					String in = inputField.getText();
-					int[] nums = new int[4];
-					String[] chars = in.split("");
-					for (int i = 0; i < nums.length; i++) {
-						nums[i] = Integer.parseInt(chars[i]);
-					}
-					b.move(nums[0], nums[1], nums[2], nums[3]);
-					chessView.repaint();
-					inputField.setText("");
-					inputField.requestFocus();
-				} catch (Exception exc) {
-					// was unable to parse the input
-					exc.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Invalid format.");
-				}
-			}
-		});
 	}
 }
+

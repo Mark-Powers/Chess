@@ -25,4 +25,8 @@ public class Pawn extends Piece {
 		}
 		return false;
 	}
+	public int getValue(){
+    	return 1;
+    }
+	
 }

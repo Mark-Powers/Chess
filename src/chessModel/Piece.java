@@ -1,11 +1,10 @@
 package chessModel;
 public abstract class Piece
 {
-    protected int x;
+    protected int x;    
     protected int y;
     protected int side;
-    
-    
+        
     public void setX(int x){
         this.x = x;
     }
@@ -22,5 +21,6 @@ public abstract class Piece
     	return side;
     }
     public abstract String getChar();
+    public abstract int getValue();
     public abstract boolean validMove(int x, int y, SquareStatus status);
 }

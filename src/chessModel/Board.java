@@ -3,16 +3,18 @@ package chessModel;
 import java.util.ArrayList;
 
 public class Board {
-	public int boardWidth;
-	public int boardHeight;
-	public int currentTeamNo;
+	public final int boardWidth;
+	public final int boardHeight;
 	private ArrayList<Piece> pieces = new ArrayList<Piece>();
 	private ArrayList<Integer[]> movelog;
+	private int whiteScore;
+	private int blackScore;
 
 	public Board() {
-		currentTeamNo = 0;
 		boardWidth = 8;
 		boardHeight = 8;
+		whiteScore = 0;
+		blackScore = 0;
 		for (int i = 0; i < 8; i++) {
 			pieces.add(new Pawn(1, i, 0));
 			pieces.add(new Pawn(6, i, 1));
@@ -36,7 +38,7 @@ public class Board {
 		movelog = new ArrayList<Integer[]>();
 	}
 
-	public void move(int oldX, int oldY, int x, int y) {
+	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece selectedP = null;
 		Piece otherP = null;
 		SquareStatus status = SquareStatus.EMPTY;
@@ -54,14 +56,25 @@ public class Board {
 				}
 			}
 
-			if (currentTeamNo == selectedP.getSide()
-					&& !status.equals(SquareStatus.TEAM)
+			if (!status.equals(SquareStatus.TEAM)
 					&& selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
+				if(isInCheck(selectedP.getSide())){
+					
+					// Check if new move undoes check.
+				}
+				
 				selectedP.setX(x);
 				selectedP.setY(y);
 				if (status.equals(SquareStatus.ENEMY)) {
+					int scoreEarned = otherP.getValue();
+					if(selectedP.getSide()==0){
+						whiteScore+=scoreEarned;
+					} else if (selectedP.getSide()==1){
+						blackScore+=scoreEarned;
+					}
 					pieces.remove(otherP);
+					
 				}
 				Integer[] numsForLog = new Integer[4];
 				numsForLog[0] = oldX;
@@ -69,9 +82,10 @@ public class Board {
 				numsForLog[2] = x;
 				numsForLog[3] = y;
 				movelog.add(numsForLog);
-				currentTeamNo = currentTeamNo == 0 ? 1 : 0;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public boolean isObstructed(Piece p, int x, int y) {
@@ -112,10 +126,6 @@ public class Board {
 		return false;
 	}
 
-	public void display() {
-		print(getBoard());
-	}
-
 	public String getBoard() {
 		String board = "";
 		boolean wasPrinted;
@@ -145,10 +155,37 @@ public class Board {
 		return board;
 	}
 
-	public void print(String s) {
-		System.out.print(s);
+	public boolean isThreatenedSquare(int x, int y, int side){
+		for(Piece p:pieces){
+			if(p.getSide()!=side){
+				SquareStatus squareToCheck = SquareStatus.ENEMY;
+				for(Piece otherP:pieces){
+					if(otherP.getX()==x && otherP.getY()==y){
+						if(otherP.getSide()==p.getSide()){
+							squareToCheck = SquareStatus.TEAM;
+						} else {
+							squareToCheck = SquareStatus.ENEMY;
+						}
+						break;
+					}
+				}
+				if(p.validMove(x, y, squareToCheck)){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
-
+	
+	public boolean isInCheck(int side){
+		for(Piece p:pieces){
+			if(p instanceof King && p.getSide()==side){
+				return isThreatenedSquare(p.getX(), p.getY(), side);
+			}
+		}
+		return false;
+	}
+	
 	public ArrayList<Piece> getPieces() {
 		return pieces;
 	}
@@ -164,5 +201,11 @@ public class Board {
 
 	public ArrayList<Integer[]> getMoveLog() {
 		return movelog;
+	}
+	public int getWhiteScore(){
+		return whiteScore;
+	}
+	public int getBlackScore(){
+		return blackScore;
 	}
 }

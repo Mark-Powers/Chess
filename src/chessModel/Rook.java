@@ -15,4 +15,7 @@ public class Rook extends Piece
     public boolean validMove(int x, int y, SquareStatus status){
         return ( this.x==x || this.y==y );
     }
+    public int getValue(){
+    	return 5;
+    }
 }

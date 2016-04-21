@@ -16,4 +16,7 @@ public class Queen extends Piece
     public boolean validMove(int x, int y, SquareStatus status){
         return ( ( this.x==x || this.y==y ) || (Math.abs(this.x-x) == Math.abs(this.y-y)) );
     }
+    public int getValue(){
+    	return 9;
+    }
 }
