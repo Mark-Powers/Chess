@@ -55,8 +55,8 @@ public class ChessFrame extends JFrame {
 
 		menu = new JMenuBar();
 		file = new JMenu("File");
-		save = new JMenuItem("Save PGM...");
-		viewLog = new JMenuItem("View PGM...");
+		save = new JMenuItem("Save PGN...");
+		viewLog = new JMenuItem("View PGN...");
 		menu.add(file);
 		file.add(save);
 		file.add(viewLog);
@@ -87,11 +87,14 @@ public class ChessFrame extends JFrame {
 			// @Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = new JFileChooser();
-				File f = new File("C:/CHESSLOGS");
-				fc.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
+				File f = new File(System.getProperty("user.home")+"/CHESSLOGS");
+				fc.setFileFilter(new FileNameExtensionFilter("PGN File", "pgn"));
 				f.mkdirs();
 				fc.setCurrentDirectory(f);
 				fc.showSaveDialog(fc.getParent());
+				/*if (!fc.getSelectedFile().getName().contains(".")){
+					fc.setSelectedFile(new File(fc.getSelectedFile().getAbsolutePath()+".pgn"));
+				}*/
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					pw.write(b.getMoveLog().toString());
@@ -126,8 +129,8 @@ public class ChessFrame extends JFrame {
 		chessView.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				int cellSize = chessView.getCellSize();
-				int xLoc = (e.getY()) / cellSize;
-				int yLoc = (e.getX()) / cellSize;
+				int xLoc = (e.getY()) / cellSize - 1;
+				int yLoc = (e.getX()) / cellSize - 1;
 				if (chessView.getSelected() != null) {
 					b.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
 					chessView.setSelected(null);
