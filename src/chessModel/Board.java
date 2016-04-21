@@ -7,9 +7,10 @@ public class Board {
 	public int boardHeight;
 	public int currentTeamNo;
 	private ArrayList<Piece> pieces = new ArrayList<Piece>();
-	private ArrayList<Integer[]> movelog;
+	private ChessLog movelog;
 	public static final int STANDARD = 1;
 	public static final int SPEEDCHESS = 2;
+	public int moveNo;
 
 	public Board (){
 		this(STANDARD);
@@ -17,11 +18,12 @@ public class Board {
 	
 	public Board(int config) {
 		currentTeamNo = 0;
+		moveNo = 1;
 		boardWidth = 8;
 		boardHeight = 8;
+		movelog = new ChessLog();
 		
 		initPieces(config);
-		movelog = new ArrayList<Integer[]>();
 	}
 
 	private void initPieces(int config) {
@@ -97,12 +99,12 @@ public class Board {
 				if (status.equals(SquareStatus.ENEMY)) {
 					pieces.remove(otherP);
 				}
-				Integer[] numsForLog = new Integer[4];
-				numsForLog[0] = oldX;
-				numsForLog[1] = oldY;
-				numsForLog[2] = x;
-				numsForLog[3] = y;
-				movelog.add(numsForLog);
+				
+				movelog.addToLog(oldX,oldY,x,y,this);
+				
+				if (currentTeamNo == 1){
+					moveNo++;
+				}
 				currentTeamNo = currentTeamNo == 0 ? 1 : 0;
 			}
 		}
@@ -195,7 +197,7 @@ public class Board {
 		return null;
 	}
 
-	public ArrayList<Integer[]> getMoveLog() {
-		return movelog;
+	public String getMoveLog() {
+		return movelog.toString();
 	}
 }

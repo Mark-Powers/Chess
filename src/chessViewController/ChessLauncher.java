@@ -70,16 +70,15 @@ public class ChessLauncher extends JFrame {
 		
 		addButton("Standard",Board.STANDARD);
 		addButton("Speedchess",Board.SPEEDCHESS);
+		
 		go.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new GraphicsGUI(new Board(selectedGame));
+				new ChessFrame(new Board(selectedGame));
 				dispose();
 			}
 		});
-		go.setEnabled(false);
 		
-
 		pack();
 		setSize(200,200);
 		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
@@ -93,7 +92,6 @@ public class ChessLauncher extends JFrame {
 		p.add(newButton,gbc);
 		groupTypes.add(newButton);
 		typesMap.put(name, type);
-
 		newButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -101,5 +99,11 @@ public class ChessLauncher extends JFrame {
 				go.setEnabled(true);
 			}
 		});
+		
+		// initial state
+		if (newButton.getActionCommand().equals("Standard")){
+			newButton.setSelected(true);
+			selectedGame = Board.STANDARD;
+		}		
 	}
 }

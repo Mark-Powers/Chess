@@ -1,7 +1,9 @@
 package chessViewController;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,28 +13,32 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.sun.java.accessibility.util.java.awt.ButtonTranslator;
+
 import chessModel.Board;
 import chessModel.Piece;
 
-public class GraphicsGUI extends JFrame {
+public class ChessFrame extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
-	private JMenuItem save;
+	private JMenuItem save,viewLog;
 	private Board b;
 	private ChessView chessView;
 	private JTextField inputField;
 
-	public GraphicsGUI(Board board) {
+	public ChessFrame(Board board) {
 		this.setResizable(false);
 		this.setMinimumSize(new Dimension(500,500));
 
@@ -49,9 +55,11 @@ public class GraphicsGUI extends JFrame {
 
 		menu = new JMenuBar();
 		file = new JMenu("File");
-		save = new JMenuItem("Save...");
+		save = new JMenuItem("Save PGM...");
+		viewLog = new JMenuItem("View PGM...");
 		menu.add(file);
 		file.add(save);
+		file.add(viewLog);
 
 		this.setJMenuBar(menu);
 
@@ -74,7 +82,7 @@ public class GraphicsGUI extends JFrame {
 
 		inputField.requestFocus();
 
-		save.addActionListener(new ActionListener() {
+		final ActionListener writeActionListener = (new ActionListener() {
 
 			// @Override
 			public void actionPerformed(ActionEvent e) {
@@ -86,18 +94,32 @@ public class GraphicsGUI extends JFrame {
 				fc.showSaveDialog(fc.getParent());
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
-					StringBuilder log = new StringBuilder();
-					for (Integer[] nums : b.getMoveLog()) {
-						for (int i = 0; i < nums.length; i++) {
-							log.append(nums[i]);
-						}
-						log.append("\r\n");
-					}
-					pw.write(log.toString());
+					pw.write(b.getMoveLog().toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to write file");
 				}
+			}
+		});
+		
+		save.addActionListener(writeActionListener);
+		
+		viewLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame f = new JFrame("Log");
+				JTextArea ta = new JTextArea(b.getMoveLog().toString());
+				f.setLayout(new BorderLayout());
+				ta.setEditable(false);
+				ta.setForeground(Color.gray);
+				ta.setMargin(new Insets(12,12,12,12));
+				f.add(ta,BorderLayout.CENTER);
+				JButton button = new JButton("Save...");
+				button.addActionListener(writeActionListener);
+				f.add(button,BorderLayout.SOUTH);
+				f.setVisible(true);
+				f.pack();
+				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
 		});
 
