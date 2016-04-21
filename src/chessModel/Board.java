@@ -7,7 +7,7 @@ public class Board {
 	public int boardHeight;
 	public int currentTeamNo;
 	private ArrayList<Piece> pieces = new ArrayList<Piece>();
-	private ChessLog movelog;
+	private Log movelog;
 	public static final int STANDARD = 1;
 	public static final int SPEEDCHESS = 2;
 	public int moveNo;
@@ -21,7 +21,7 @@ public class Board {
 		moveNo = 1;
 		boardWidth = 8;
 		boardHeight = 8;
-		movelog = new ChessLog();
+		movelog = new Log();
 		
 		initPieces(config);
 	}
@@ -100,7 +100,7 @@ public class Board {
 					pieces.remove(otherP);
 				}
 				
-				movelog.addToLog(oldX,oldY,x,y,this);
+				movelog.addToLog(oldX,oldY,x,y,moveNo,currentTeamNo);
 				
 				if (currentTeamNo == 1){
 					moveNo++;
