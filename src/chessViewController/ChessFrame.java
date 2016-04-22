@@ -1,8 +1,10 @@
 package chessViewController;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +23,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -29,10 +33,10 @@ import chessModel.Board;
 import chessModel.Game;
 import chessModel.Piece;
 
-public class GraphicsGUI extends JFrame {
+public class ChessFrame extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
-	private JMenuItem save;
+	private JMenuItem save, viewLog;
 	private Game g;
 	private ChessView chessView;
 	JLabel timer1Label;
@@ -41,10 +45,10 @@ public class GraphicsGUI extends JFrame {
 	JLabel player2Score;
 	
 	public static void main(String args[]) {
-		new GraphicsGUI();
+		new ChessFrame();
 	}
 
-	public GraphicsGUI() {
+	public ChessFrame() {
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
 
@@ -61,9 +65,11 @@ public class GraphicsGUI extends JFrame {
 
 		menu = new JMenuBar();
 		file = new JMenu("File");
-		save = new JMenuItem("Save...");
+		save = new JMenuItem("Save PGN...");
+		viewLog = new JMenuItem("View PGN...");
 		menu.add(file);
 		file.add(save);
+		file.add(viewLog);
 
 		this.setJMenuBar(menu);
 		
@@ -101,50 +107,66 @@ public class GraphicsGUI extends JFrame {
 		timerScorePanel.add(timer2Label);
 		this.add(timerScorePanel, BorderLayout.SOUTH);
 		
-		
 		this.add(chessView, BorderLayout.CENTER);
-
 		pack();
+		this.setSize(getWidth(),(int) chessView.getSize().getHeight());
 
-		this.setSize(424, 500);
 
 		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
 				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		final ActionListener writeActionListener = (new ActionListener() {
 
-		save.addActionListener(new ActionListener() {
 
 			// @Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = new JFileChooser();
-				File f = new File("C:/CHESSLOGS");
-				fc.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
+				File f = new File(System.getProperty("user.home")+"/CHESSLOGS");
+				fc.setFileFilter(new FileNameExtensionFilter("PGN File", "pgn"));
 				f.mkdirs();
 				fc.setCurrentDirectory(f);
 				fc.showSaveDialog(fc.getParent());
+				/*if (!fc.getSelectedFile().getName().contains(".")){
+					fc.setSelectedFile(new File(fc.getSelectedFile().getAbsolutePath()+".pgn"));
+				}*/
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
-					StringBuilder log = new StringBuilder();
-					for (Integer[] nums : g.getBoard().getMoveLog()) {
-						for (int i = 0; i < nums.length; i++) {
-							log.append(nums[i]);
-						}
-						log.append("\r\n");
-					}
-					pw.write(log.toString());
+					pw.write(g.getBoard().getMoveLog().toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to write file");
 				}
 			}
 		});
+		
+		save.addActionListener(writeActionListener);
+		
+		viewLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame f = new JFrame("Log");
+				JTextArea ta = new JTextArea(g.getBoard().getMoveLog().toString());
+				f.setLayout(new BorderLayout());
+				ta.setEditable(false);
+				ta.setForeground(Color.gray);
+				ta.setMargin(new Insets(12,12,12,12));
+				f.add(ta,BorderLayout.CENTER);
+				JButton button = new JButton("Save...");
+				button.addActionListener(writeActionListener);
+				f.add(button,BorderLayout.SOUTH);
+				f.setVisible(true);
+				f.pack();
+				f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			}
+		});
 
 		chessView.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				int cellSize = chessView.getCellSize();
-				int xLoc = (e.getY()) / cellSize;
-				int yLoc = (e.getX()) / cellSize;
+				int xLoc = (e.getY()) / cellSize - 1;
+				int yLoc = (e.getX()) / cellSize - 1;
 				if (chessView.getSelected() != null) {
 					g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
 					chessView.setSelected(null);
@@ -162,7 +184,6 @@ public class GraphicsGUI extends JFrame {
 				}
 			}
 		});
-
 	}
 }
 
