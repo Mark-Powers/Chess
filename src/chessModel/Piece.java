@@ -5,6 +5,10 @@ public abstract class Piece
     protected int y;
     protected int side;
         
+    public boolean validMove(int x, int y, SquareStatus status, boolean checking){
+    	return validMove(x, y, status);
+    }
+    
     public void setX(int x){
         this.x = x;
     }

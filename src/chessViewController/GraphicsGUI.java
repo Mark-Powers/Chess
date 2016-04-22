@@ -80,8 +80,13 @@ public class GraphicsGUI extends JFrame {
 		player2Score= new JLabel("", SwingConstants.CENTER);
 		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10 times a second
 			public void actionPerformed(ActionEvent e) {
-				timer1Label.setText("P1 Time: "+g.getPlayer1Time());
-				timer2Label.setText("P2 Time: "+g.getPlayer2Time());
+				if(g.getCurrentSide()==0){
+					timer1Label.setText("<html>P1 Time: <font color='red'>"+g.getPlayer1Time()+"</font></html>");
+					timer2Label.setText("<html>P2 Time: "+g.getPlayer2Time()+"</html>");
+				} else if(g.getCurrentSide()==1){
+					timer1Label.setText("<html>P1 Time: "+g.getPlayer1Time()+"</html>");
+					timer2Label.setText("<html>P2 Time: <font color='red'>"+g.getPlayer2Time()+"</font></html>");
+				}
 				player1Score.setText("Score: "+g.getPlayer1Score());
 				player2Score.setText("Score: "+g.getPlayer2Score());
 				// TODO CHECK FOR GAMEOVER

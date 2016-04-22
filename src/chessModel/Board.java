@@ -59,22 +59,22 @@ public class Board {
 			if (!status.equals(SquareStatus.TEAM)
 					&& selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
-				if(isInCheck(selectedP.getSide())){
-					
+				if (isInCheck(selectedP.getSide())) {
+
 					// Check if new move undoes check.
 				}
-				
+
 				selectedP.setX(x);
 				selectedP.setY(y);
 				if (status.equals(SquareStatus.ENEMY)) {
 					int scoreEarned = otherP.getValue();
-					if(selectedP.getSide()==0){
-						whiteScore+=scoreEarned;
-					} else if (selectedP.getSide()==1){
-						blackScore+=scoreEarned;
+					if (selectedP.getSide() == 0) {
+						whiteScore += scoreEarned;
+					} else if (selectedP.getSide() == 1) {
+						blackScore += scoreEarned;
 					}
 					pieces.remove(otherP);
-					
+
 				}
 				Integer[] numsForLog = new Integer[4];
 				numsForLog[0] = oldX;
@@ -101,7 +101,7 @@ public class Board {
 		// must be up down
 		if (p.getY() == y) {
 			int dir = x > p.getX() ? 1 : -1;
-			for (int tmpX = p.getX() + dir;  tmpX != x; tmpX += dir) {
+			for (int tmpX = p.getX() + dir; tmpX != x; tmpX += dir) {
 				if (getPiece(tmpX, y) != null) {
 					return true;
 				}
@@ -113,14 +113,14 @@ public class Board {
 			int dirX = x > p.getX() ? 1 : -1;
 			int tmpY = p.getY() + dirY;
 			int tmpX = p.getX() + dirX;
-			while(tmpX != x && tmpY != y) {
+			while (tmpX != x && tmpY != y) {
 				if (getPiece(tmpX, tmpY) != null) {
 					return true;
 				}
-				tmpX += dirX; 
-				tmpY +=dirY;
+				tmpX += dirX;
+				tmpY += dirY;
 			}
-			
+
 		}
 		// Otherwise it must be fine
 		return false;
@@ -155,39 +155,42 @@ public class Board {
 		return board;
 	}
 
-	public boolean isThreatenedSquare(int x, int y, int side){
-		for(Piece p:pieces){
-			if(p.getSide()!=side){
-				SquareStatus squareToCheck = SquareStatus.ENEMY;
-				for(Piece otherP:pieces){
-					if(otherP.getX()==x && otherP.getY()==y){
-						if(otherP.getSide()==p.getSide()){
-							squareToCheck = SquareStatus.TEAM;
-						} else {
-							squareToCheck = SquareStatus.ENEMY;
-						}
-						break;
-					}
-				}
-				if(p.validMove(x, y, squareToCheck)){
-					return true;
-				}
+	public boolean isThreatenedSquare(int x, int y, int side) {
+		for (Piece p : pieces) {
+			SquareStatus squareToCheck = getSquareStatus(x, y, p.getSide());
+			if (p.validMove(x, y, squareToCheck, true)) {
+				return true;
 			}
 		}
 		return false;
 	}
-	
-	public boolean isInCheck(int side){
-		for(Piece p:pieces){
-			if(p instanceof King && p.getSide()==side){
+
+	public boolean isInCheck(int side) {
+		for (Piece p : pieces) {
+			if (p instanceof King && p.getSide() == side) {
 				return isThreatenedSquare(p.getX(), p.getY(), side);
 			}
 		}
 		return false;
 	}
-	
+
 	public ArrayList<Piece> getPieces() {
 		return pieces;
+	}
+
+	public SquareStatus getSquareStatus(int x, int y, int side) {
+		SquareStatus square = SquareStatus.EMPTY;
+		for (Piece otherP : pieces) {
+			if (otherP.getX() == x && otherP.getY() == y) {
+				if (otherP.getSide() == side) {
+					square = SquareStatus.TEAM;
+				} else {
+					square = SquareStatus.ENEMY;
+				}
+				break;
+			}
+		}
+		return square;
 	}
 
 	public Piece getPiece(int x, int y) {
@@ -199,13 +202,39 @@ public class Board {
 		return null;
 	}
 
+	public ArrayList<Integer[]> getAllMoves(int side) {
+		ArrayList<Integer[]> moveList = new ArrayList<Integer[]>();
+		for (int i = 0; i < boardHeight; i++) {
+			for (int u = 0; u < boardWidth; u++) {
+				for (Piece p : pieces) {
+					if (p.getSide() == side) {
+						SquareStatus status = getSquareStatus(u, i, p.getSide());
+						if (!status.equals(SquareStatus.TEAM)
+								&& p.validMove(u, i, status, true)
+								&& !isObstructed(p, u, i)) {
+							Integer[] array = new Integer[4];
+							array[0] = p.getX();
+							array[1] = p.getY();
+							array[2] = u;
+							array[3] = i;
+							moveList.add(array);
+						}
+					}
+				}
+			}
+		}
+		return moveList;
+	}
+
 	public ArrayList<Integer[]> getMoveLog() {
 		return movelog;
 	}
-	public int getWhiteScore(){
+
+	public int getWhiteScore() {
 		return whiteScore;
 	}
-	public int getBlackScore(){
+
+	public int getBlackScore() {
 		return blackScore;
 	}
 }
