@@ -3,6 +3,7 @@ package chessViewController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -16,31 +17,40 @@ import java.io.PrintWriter;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.sun.java.accessibility.util.java.awt.ButtonTranslator;
-
 import chessModel.Board;
+import chessModel.Game;
 import chessModel.Piece;
 
 public class ChessFrame extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
-	private JMenuItem save,viewLog;
-	private Board b;
+	private JMenuItem save, viewLog;
+	private Game g;
 	private ChessView chessView;
-	private JTextField inputField;
+	JLabel timer1Label;
+	JLabel timer2Label;
+	JLabel player1Score;
+	JLabel player2Score;
+	
+	public static void main(String args[]) {
+		new ChessFrame();
+	}
 
-	public ChessFrame(Board board) {
-		this.setResizable(false);
-		this.setMinimumSize(new Dimension(500,500));
+	public ChessFrame() {
+		// this.setResizable(false);
+		this.setMinimumSize(new Dimension(300, 300));
 
 		setVisible(true);
 
@@ -62,14 +72,41 @@ public class ChessFrame extends JFrame {
 		file.add(viewLog);
 
 		this.setJMenuBar(menu);
-
-		b = board;
+		
+		g = new Game();
+		Board b = g.getBoard();
 
 		chessView = new ChessView(b);
-
-		inputField = new JTextField(10);
 		
-		this.add(inputField, BorderLayout.SOUTH);
+		
+		// Timer/Score area stuff
+		timer1Label = new JLabel("", SwingConstants.CENTER);
+		timer2Label = new JLabel("", SwingConstants.CENTER);
+		player1Score= new JLabel("", SwingConstants.CENTER);
+		player2Score= new JLabel("", SwingConstants.CENTER);
+		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10 times a second
+			public void actionPerformed(ActionEvent e) {
+				if(g.getCurrentSide()==0){
+					timer1Label.setText("<html>P1 Time: <font color='red'>"+g.getPlayer1Time()+"</font></html>");
+					timer2Label.setText("<html>P2 Time: "+g.getPlayer2Time()+"</html>");
+				} else if(g.getCurrentSide()==1){
+					timer1Label.setText("<html>P1 Time: "+g.getPlayer1Time()+"</html>");
+					timer2Label.setText("<html>P2 Time: <font color='red'>"+g.getPlayer2Time()+"</font></html>");
+				}
+				player1Score.setText("Score: "+g.getPlayer1Score());
+				player2Score.setText("Score: "+g.getPlayer2Score());
+				// TODO CHECK FOR GAMEOVER
+			}
+		});
+		updateTimer.start();
+		JPanel timerScorePanel = new JPanel();
+		timerScorePanel.setLayout(new GridLayout(1, 4));
+		timerScorePanel.add(timer1Label);
+		timerScorePanel.add(player1Score);
+		timerScorePanel.add(player2Score);
+		timerScorePanel.add(timer2Label);
+		this.add(timerScorePanel, BorderLayout.SOUTH);
+		
 		this.add(chessView, BorderLayout.CENTER);
 		pack();
 		this.setSize(getWidth(),(int) chessView.getSize().getHeight());
@@ -79,10 +116,9 @@ public class ChessFrame extends JFrame {
 		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
 				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		inputField.requestFocus();
-
+		
 		final ActionListener writeActionListener = (new ActionListener() {
+
 
 			// @Override
 			public void actionPerformed(ActionEvent e) {
@@ -97,7 +133,7 @@ public class ChessFrame extends JFrame {
 				}*/
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
-					pw.write(b.getMoveLog().toString());
+					pw.write(g.getBoard().getMoveLog().toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to write file");
@@ -111,7 +147,7 @@ public class ChessFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFrame f = new JFrame("Log");
-				JTextArea ta = new JTextArea(b.getMoveLog().toString());
+				JTextArea ta = new JTextArea(g.getBoard().getMoveLog().toString());
 				f.setLayout(new BorderLayout());
 				ta.setEditable(false);
 				ta.setForeground(Color.gray);
@@ -132,11 +168,11 @@ public class ChessFrame extends JFrame {
 				int xLoc = (e.getY()) / cellSize - 1;
 				int yLoc = (e.getX()) / cellSize - 1;
 				if (chessView.getSelected() != null) {
-					b.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
+					g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
 					chessView.setSelected(null);
 					chessView.repaint();
 				} else {
-					Piece p = b.getPiece(xLoc, yLoc);
+					Piece p = g.getBoard().getPiece(xLoc, yLoc);
 					if (p == null) {
 						chessView.setSelected(null);
 					} else if (p.equals(chessView.getSelected())) {
@@ -148,29 +184,6 @@ public class ChessFrame extends JFrame {
 				}
 			}
 		});
-
-		// handle enter key
-		inputField.addActionListener(new ActionListener() {
-
-			// @Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					// use each character as input to a board move
-					String in = inputField.getText();
-					int[] nums = new int[4];
-					String[] chars = in.split("");
-					for (int i = 0; i < nums.length; i++) {
-						nums[i] = Integer.parseInt(chars[i]);
-					}
-					b.move(nums[0], nums[1], nums[2], nums[3]);
-					chessView.repaint();
-					inputField.setText("");
-					inputField.requestFocus();
-				} catch (Exception exc) {
-					// was unable to parse the input
-					JOptionPane.showMessageDialog(null, "Invalid format.");
-				}
-			}
-		});
 	}
 }
+

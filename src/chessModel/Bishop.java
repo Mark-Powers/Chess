@@ -16,4 +16,7 @@ public class Bishop extends Piece
     public boolean validMove(int x, int y, SquareStatus status){
         return ((Math.abs(this.x-x) == Math.abs(this.y-y)));
     }
+    public int getValue(){
+    	return 3;
+    }
 }

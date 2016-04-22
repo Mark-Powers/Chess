@@ -18,4 +18,7 @@ public class Knight extends Piece
     	int yDiff = Math.abs(y-this.y);
     	return (xDiff != 3 && yDiff != 3 && (xDiff+yDiff)==3);
     }
+    public int getValue(){
+    	return 3;
+    }
 }

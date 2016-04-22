@@ -74,7 +74,7 @@ public class ChessLauncher extends JFrame {
 		go.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new ChessFrame(new Board(selectedGame));
+				new ChessFrame();
 				dispose();
 			}
 		});

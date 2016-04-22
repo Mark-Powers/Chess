@@ -15,6 +15,13 @@ public class Pawn extends Piece {
 		return "p";
 	}
 
+	public boolean validMove(int x2, int y2, SquareStatus status, boolean justChecking) {
+		boolean oldFirstMove = hasTakenFirstMove;
+		boolean toRet = validMove(x2, y2, status);
+		hasTakenFirstMove = oldFirstMove;
+		return toRet;
+		
+	}
 	public boolean validMove(int x2, int y2, SquareStatus status) {
 		// TODO En Passant
 		if ((((side == 0 && y == y2 && x == (x2 - 1)) || (side == 1 && y == y2 && x == (x2 + 1))) && !status.equals(SquareStatus.ENEMY))
@@ -25,4 +32,8 @@ public class Pawn extends Piece {
 		}
 		return false;
 	}
+	public int getValue(){
+    	return 1;
+    }
+	
 }
