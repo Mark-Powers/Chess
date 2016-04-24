@@ -57,13 +57,15 @@ public class Board {
 			}
 
 			if (!status.equals(SquareStatus.TEAM)
-					&& selectedP.validMove(x, y, status)
+					&& selectedP.validMove(x, y, status, true)
 					&& !isObstructed(selectedP, x, y)) {
 				if (isInCheck(selectedP.getSide())) {
-
-					// Check if new move undoes check.
+					if (!resolvesCheck(selectedP, x, y)) {
+						System.out.println("is in check");
+						return false;
+					}
 				}
-
+				selectedP.validMove(x, y, status);
 				selectedP.setX(x);
 				selectedP.setY(y);
 				if (status.equals(SquareStatus.ENEMY)) {
@@ -157,9 +159,11 @@ public class Board {
 
 	public boolean isThreatenedSquare(int x, int y, int side) {
 		for (Piece p : pieces) {
-			SquareStatus squareToCheck = getSquareStatus(x, y, p.getSide());
-			if (p.validMove(x, y, squareToCheck, true)) {
-				return true;
+			if (p.getSide() != side) { // Only the other team can threaten a square for any given side
+				SquareStatus squareToCheck = getSquareStatus(x, y, p.getSide());
+				if (p.validMove(x, y, squareToCheck, true) && !isObstructed(p, x, y)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -172,6 +176,22 @@ public class Board {
 			}
 		}
 		return false;
+	}
+
+	public boolean resolvesCheck(Piece p, int x, int y) {
+		boolean ret = true;
+		int oldX = p.getX();
+		int oldY = p.getY();
+		p.setX(x);
+		p.setY(y);
+
+		if (isInCheck(p.side)) {
+			ret = false;
+		}
+		p.setX(oldX);
+		p.setY(oldY);
+
+		return ret;
 	}
 
 	public ArrayList<Piece> getPieces() {
@@ -204,22 +224,24 @@ public class Board {
 
 	public ArrayList<Integer[]> getAllMoves(int side) {
 		ArrayList<Integer[]> moveList = new ArrayList<Integer[]>();
+		for (Piece p : pieces) {
+			moveList.add(getMoveForPiece(p));
+		}
+		return moveList;
+	}
+
+	public Integer[] getMoveForPiece(Piece p) {
+		Integer[] moveList = new Integer[4];
 		for (int i = 0; i < boardHeight; i++) {
 			for (int u = 0; u < boardWidth; u++) {
-				for (Piece p : pieces) {
-					if (p.getSide() == side) {
-						SquareStatus status = getSquareStatus(u, i, p.getSide());
-						if (!status.equals(SquareStatus.TEAM)
-								&& p.validMove(u, i, status, true)
-								&& !isObstructed(p, u, i)) {
-							Integer[] array = new Integer[4];
-							array[0] = p.getX();
-							array[1] = p.getY();
-							array[2] = u;
-							array[3] = i;
-							moveList.add(array);
-						}
-					}
+				SquareStatus status = getSquareStatus(u, i, p.getSide());
+				if (!status.equals(SquareStatus.TEAM)
+						&& p.validMove(u, i, status, true)
+						&& !isObstructed(p, u, i)) {
+					moveList[0] = p.getX();
+					moveList[1] = p.getY();
+					moveList[2] = u;
+					moveList[3] = i;
 				}
 			}
 		}
