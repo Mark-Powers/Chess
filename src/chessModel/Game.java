@@ -13,7 +13,7 @@ public class Game {
 	private Time player1TimeLeft;
 	private Time player2TimeLeft;
 
-	public static final int DEFAULT_TIME = 600; // In Seconds, 3600 is one hour
+	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
 
 	public Game() {
 		board = new Board();
@@ -24,13 +24,11 @@ public class Game {
 		side1Timer = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				player1TimeLeft.dec();
-				checkIfGameOver();
 			}
 		});
 		side2Timer = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				player2TimeLeft.dec();
-				checkIfGameOver();
 			}
 		});
 		side1Timer.start();
@@ -73,11 +71,28 @@ public class Game {
 		return board.getBlackScore();
 	}
 		
-	public void checkIfGameOver() {
-		if (player1TimeLeft.isZero()|| player2TimeLeft.isZero()) {
-			System.out.println("TIME UP");
-			//side1Timer.stop();
-			//side2Timer.stop();
+	/**
+	 * @param side The side that is being checked for checkmate
+	 * @return
+	 */
+	public boolean isCheckMate(){
+		if(!board.isInCheck(currentSide)){ // Can't be in checkmate if not in check
+			return false;
 		}
+		for(Integer[] move : board.getAllMoves(0)){
+			Piece p = board.getPiece(move[0], move[1]);
+			if(board.resolvesCheck(p, move[2], move[3])){
+				return false; // If there is a move that resolves check, it is not checkmate
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * @param side The side that is being checked for a draw
+	 * @return
+	 */
+	public boolean isDraw(){
+		return (board.getAllMoves(currentSide).size()==0);
 	}
 }

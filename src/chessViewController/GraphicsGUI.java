@@ -89,7 +89,6 @@ public class GraphicsGUI extends JFrame {
 				}
 				player1Score.setText("Score: "+g.getPlayer1Score());
 				player2Score.setText("Score: "+g.getPlayer2Score());
-				// TODO CHECK FOR GAMEOVER
 			}
 		});
 		updateTimer.start();
@@ -162,7 +161,16 @@ public class GraphicsGUI extends JFrame {
 				}
 			}
 		});
-
+	}
+	
+	public void isOver(){
+		if(g.isCheckMate()){
+			JOptionPane.showMessageDialog(this, g.getCurrentSide()+" has lost from checkmate");
+		} else if(g.isDraw()){
+			JOptionPane.showMessageDialog(this, "It's a draw!");
+		} else if(g.getPlayer1Time().equals("0:0") || g.getPlayer2Time().equals("0:0")){
+			JOptionPane.showMessageDialog(this, "Time's Up!");
+		}
 	}
 }
 
