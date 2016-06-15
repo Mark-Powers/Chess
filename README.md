@@ -1,9 +1,7 @@
 # Chess
-A simple java chess simulator
+A chess program, that allows for the writing of custom AI.
 
-Usage
-Enter 4 lines of numbers, as follows:
-row source,
-column source,
-row destination,
-column destination
+## Usage
+This project is a work in progress. 
+
+
