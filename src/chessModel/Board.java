@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Board {
 	public final int boardWidth;
 	public final int boardHeight;
-	private ArrayList<Piece> pieces = new ArrayList<Piece>();
+	protected ArrayList<Piece> pieces = new ArrayList<Piece>();
 	private ArrayList<Integer[]> movelog;
 	private int whiteScore;
 	private int blackScore;
