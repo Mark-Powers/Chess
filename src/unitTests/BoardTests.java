@@ -1,6 +1,8 @@
 package unitTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.Dimension;
 
@@ -192,6 +194,8 @@ public class BoardTests {
 	@Test
 	public void testFENStartPosition(){
 		Board board = new Board();
+		System.out.println(board.getFEN());
+		assertFalse("Board is upside down", board.getFEN().startsWith("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr"));
 		assertTrue(board.getFEN().startsWith("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
 		assertEquals(board.getFEN(),"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1","Something at the end is wrong.");
 	}
