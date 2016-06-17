@@ -1,6 +1,6 @@
 package unitTests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.awt.Dimension;
 
@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import chessModel.King;
 import chessModel.Knight;
+import chessModel.Pawn;
 import chessModel.Piece;
 import chessModel.Rook;
 import chessModel.TestBoard;
@@ -144,6 +145,15 @@ public class BoardTests {
 		b.addPiece(king);
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 0));
 		assertTrue(b.isInCheck(0));
+	}
+	
+	@Test
+	public void testBasicMove(){
+		b = new TestBoard();
+		Piece pawn = new Pawn(6,5,1);
+		b.addPiece(pawn);
+		b.move(6, 5, 4, 5);
+		assertEquals(b.getPiece(4, 5), pawn);
 	}
 	
 	public static void display(TestBoard b) {

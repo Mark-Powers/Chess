@@ -6,7 +6,7 @@ public class Board {
 	public final int boardWidth;
 	public final int boardHeight;
 	protected ArrayList<Piece> pieces = new ArrayList<Piece>();
-	private ArrayList<Integer[]> movelog;
+	private Log movelog;
 	private int whiteScore;
 	private int blackScore;
 
@@ -35,7 +35,7 @@ public class Board {
 		pieces.add(new Queen(7, 3, 1));
 		pieces.add(new King(0, 4, 0));
 		pieces.add(new King(7, 4, 1));
-		movelog = new ArrayList<Integer[]>();
+		movelog = new Log();
 	}
 
 	public boolean move(int oldX, int oldY, int x, int y) {
@@ -79,7 +79,7 @@ public class Board {
 				numsForLog[1] = oldY;
 				numsForLog[2] = x;
 				numsForLog[3] = y;
-				movelog.add(numsForLog);
+				movelog.addToLog(oldX, oldY, x, y);
 				return true;
 			}
 		}
@@ -187,7 +187,7 @@ public class Board {
 	 */
 	public boolean resolvesCheck(Piece p, int x, int y) {
 		Board b = new Board();
-		for(Integer[] move : movelog){
+		for(Integer[] move : movelog.getLogArray()){
 			b.move(move[0], move[1], move[2], move[3]);
 		}
 		b.getPiece(p.getX(), p.getY()).forceMove(x, y);;
@@ -259,7 +259,7 @@ public class Board {
 	}
 
 	public ArrayList<Integer[]> getMoveLog() {
-		return movelog;
+		return movelog.getLogArray();
 	}
 
 	public int getWhiteScore() {
@@ -268,6 +268,10 @@ public class Board {
 
 	public int getBlackScore() {
 		return blackScore;
+	}
+
+	public String getMoveLogPGN() {
+		return movelog.toString();
 	}
 	
 	

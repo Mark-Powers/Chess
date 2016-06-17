@@ -68,7 +68,7 @@ public class GraphicsGUI extends JFrame {
 		this.setJMenuBar(menu);
 		
 		g = new Game();
-		Board b = g.getBoard();
+		final Board b = g.getBoard();
 
 		chessView = new ChessView(b);
 		
@@ -125,12 +125,7 @@ public class GraphicsGUI extends JFrame {
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					StringBuilder log = new StringBuilder();
-					for (Integer[] nums : g.getBoard().getMoveLog()) {
-						for (int i = 0; i < nums.length; i++) {
-							log.append(nums[i]);
-						}
-						log.append("\r\n");
-					}
+					log.append(b.getMoveLogPGN());
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
