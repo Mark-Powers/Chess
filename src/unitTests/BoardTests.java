@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import chessModel.Board;
 import chessModel.King;
 import chessModel.Knight;
 import chessModel.Piece;
@@ -21,8 +20,10 @@ import chessViewController.ChessView;
 
 public class BoardTests {
 
+	// create a test board
 	private static TestBoard b = new TestBoard();
 	
+	// brings up board on failure
 	@Rule
     public DisplayOnFail failRule = new DisplayOnFail();
 	
@@ -33,10 +34,23 @@ public class BoardTests {
 
 	@Test
 	public void testCheckRook() {
-		// create a board in test mode
 		b = new TestBoard();
 		b.addPiece(new Rook(1, 1, 0));
 		Piece king = new King(6, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Rook(1, 1, 0));
+		king = new King(1, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Rook(1, 6, 0));
+		king = new King(1, 1, 1);
 		b.addPiece(king);
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
 		assertTrue(b.isInCheck(1));
@@ -47,12 +61,10 @@ public class BoardTests {
 		b.addPiece(king);
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
 		assertTrue(b.isInCheck(1));
-
 	}
 
 	@Test
 	public void testCheckKnight() {
-		// create a board in test mode
 		b = new TestBoard();
 		b.addPiece(new Knight(6, 1, 0));
 		Piece king = new King(4, 2, 1);
@@ -60,7 +72,6 @@ public class BoardTests {
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
 		assertTrue(b.isInCheck(1));
 
-		// create a board in test mode
 		b = new TestBoard();
 		b.addPiece(new Knight(2, 1, 0));
 		king = new King(4, 2, 1);
@@ -81,8 +92,60 @@ public class BoardTests {
 		b.addPiece(king);
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
 		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(3, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(3, 6, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(5, 6, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(3, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(5, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
 	}
-
+	
+	@Test
+	public void testOtherKing() {
+		b = new TestBoard();
+		b.addPiece(new Knight(5, 2, 1));
+		Piece king = new King(4, 4, 0);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 0));
+		assertTrue(b.isInCheck(0));
+		
+		b = new TestBoard();
+		b.addPiece(new Knight(5, 2, 1));
+		king = new King(4, 4, 0);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 0));
+		assertTrue(b.isInCheck(0));
+	}
+	
 	public static void display(TestBoard b) {
 		JOptionPane.showMessageDialog(null, new ChessView(b));
 	}
