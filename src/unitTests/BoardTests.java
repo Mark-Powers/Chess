@@ -11,6 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import chessModel.Bishop;
+import chessModel.Board;
 import chessModel.King;
 import chessModel.Knight;
 import chessModel.Pawn;
@@ -59,6 +61,37 @@ public class BoardTests {
 		b = new TestBoard();
 		b.addPiece(new Rook(6, 1, 0));
 		king = new King(1, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+	}
+	
+	@Test
+	public void testCheckBishop() {
+		b = new TestBoard();
+		b.addPiece(new Bishop(1, 1, 0));
+		Piece king = new King(6, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Bishop(5, 5, 0));
+		king = new King(1, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+		
+		b = new TestBoard();
+		b.addPiece(new Bishop(6, 1, 0));
+		king = new King(1, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new TestBoard();
+		b.addPiece(new Bishop(1, 6, 0));
+		king = new King(6, 1, 1);
 		b.addPiece(king);
 		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
 		assertTrue(b.isInCheck(1));
@@ -156,8 +189,15 @@ public class BoardTests {
 		assertEquals(b.getPiece(4, 5), pawn);
 	}
 	
+	@Test
+	public void testFENStartPosition(){
+		Board board = new Board();
+		assertTrue(board.getFEN().startsWith("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
+		assertEquals(board.getFEN(),"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1","Something at the end is wrong.");
+	}
+	
 	public static void display(TestBoard b) {
-		JOptionPane.showMessageDialog(null, new ChessView(b));
+		JOptionPane.showMessageDialog(null, new ChessView(b), "Error Display View", JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static void display(String str) {

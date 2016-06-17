@@ -56,7 +56,8 @@ public class Board {
 				}
 			}
 
-			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status) && !isObstructed(selectedP, x, y)) {
+			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
+					&& !isObstructed(selectedP, x, y)) {
 				if (isInCheck(selectedP.getSide())) {
 					System.out.println("test");
 					if (!resolvesCheck(selectedP, x, y)) {
@@ -140,8 +141,7 @@ public class Board {
 					}
 				}
 				if (!wasPrinted) {
-					if ((i % 2 == 0 && u % 2 == 0)
-							|| (i % 2 != 0 && u % 2 != 0))
+					if ((i % 2 == 0 && u % 2 == 0) || (i % 2 != 0 && u % 2 != 0))
 						board += ("O");
 					else
 						board += ("O");
@@ -155,7 +155,8 @@ public class Board {
 
 	public boolean isThreatenedSquare(int x, int y, int side) {
 		for (Piece p : pieces) {
-			if (p.getSide() != side) { // Only the other team can threaten a square for any given side
+			if (p.getSide() != side) { // Only the other team can threaten a
+										// square for any given side
 				SquareStatus squareToCheck = getSquareStatus(x, y, p.getSide());
 				if (p.validMove(x, y, squareToCheck) && !isObstructed(p, x, y)) {
 					return true;
@@ -166,7 +167,8 @@ public class Board {
 	}
 
 	/**
-	 * @param side The side testing for check
+	 * @param side
+	 *            The side testing for check
 	 * @return If the side given is in check
 	 */
 	public boolean isInCheck(int side) {
@@ -187,11 +189,12 @@ public class Board {
 	 */
 	public boolean resolvesCheck(Piece p, int x, int y) {
 		Board b = new Board();
-		for(Integer[] move : movelog.getLogArray()){
+		for (Integer[] move : movelog.getLogArray()) {
 			b.move(move[0], move[1], move[2], move[3]);
 		}
-		b.getPiece(p.getX(), p.getY()).forceMove(x, y);;
-		if(b.isInCheck(p.side)){
+		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
+		;
+		if (b.isInCheck(p.side)) {
 			System.out.println("still in check");
 			return false;
 		}
@@ -219,8 +222,10 @@ public class Board {
 	}
 
 	/**
-	 * @param x The x coordinate of the piece to find 
-	 * @param y The y coordinate of the piece to find
+	 * @param x
+	 *            The x coordinate of the piece to find
+	 * @param y
+	 *            The y coordinate of the piece to find
 	 * @return The piece at coordinates (x, y), or null if there is no piece
 	 */
 	public Piece getPiece(int x, int y) {
@@ -245,9 +250,7 @@ public class Board {
 		for (int i = 0; i < boardHeight; i++) {
 			for (int u = 0; u < boardWidth; u++) {
 				SquareStatus status = getSquareStatus(u, i, p.getSide());
-				if (!status.equals(SquareStatus.TEAM)
-						&& p.validMove(u, i, status)
-						&& !isObstructed(p, u, i)) {
+				if (!status.equals(SquareStatus.TEAM) && p.validMove(u, i, status) && !isObstructed(p, u, i)) {
 					moveList[0] = p.getX();
 					moveList[1] = p.getY();
 					moveList[2] = u;
@@ -270,9 +273,35 @@ public class Board {
 		return blackScore;
 	}
 
-	public String getMoveLogPGN() {
+	public String getPGN() {
 		return movelog.toString();
 	}
-	
-	
+
+	public String getFEN() {
+		// rnbqkb1r/pp1p1ppp/5n2/2p1p3/2P1P3/5N2/PP1P1PPP/RNBQKB1R w KQkq c6 0 4
+
+		StringBuilder fen = new StringBuilder();
+		for (int y = 0; y < boardHeight; y++) {
+			for (int x = 0; x < boardWidth; x++) {
+				Piece p = getPiece(y, x);
+				if (p == null) {
+					int start = x;
+					x++;
+					while (p == null && x < boardWidth){
+						p = getPiece(y,x);
+						x++;
+					}
+					fen.append(x - start);
+				} else {
+					fen.append(p.getChar());
+				}
+			}
+			if (y < boardHeight - 1) {
+				fen.append("/");
+			}
+		}
+
+		return fen.toString();
+	}
+
 }

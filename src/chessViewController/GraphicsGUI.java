@@ -20,6 +20,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -32,7 +33,7 @@ import chessModel.Piece;
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
-	private JMenuItem save;
+	private JMenuItem save, details;
 	private Game g;
 	private ChessView chessView;
 	JLabel timer1Label;
@@ -62,8 +63,10 @@ public class GraphicsGUI extends JFrame {
 		menu = new JMenuBar();
 		file = new JMenu("File");
 		save = new JMenuItem("Save...");
+		details = new JMenuItem("View...");
 		menu.add(file);
 		file.add(save);
+		file.add(details);
 
 		this.setJMenuBar(menu);
 		
@@ -125,12 +128,32 @@ public class GraphicsGUI extends JFrame {
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					StringBuilder log = new StringBuilder();
-					log.append(b.getMoveLogPGN());
+					log.append(b.getPGN());
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to write file");
 				}
+			}
+		});
+		
+		details.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPanel p = new JPanel();
+				p.setLayout(new BorderLayout());
+				
+				JTextArea pgn = new JTextArea(b.getPGN());
+				pgn.setEditable(false);
+				
+				JTextArea fen = new JTextArea(b.getFEN());
+				fen.setEditable(false);
+				
+				p.add(pgn, BorderLayout.NORTH);
+				p.add(fen, BorderLayout.CENTER);
+				
+				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 
