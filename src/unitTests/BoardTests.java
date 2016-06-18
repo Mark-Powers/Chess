@@ -205,11 +205,29 @@ public class BoardTests {
 				"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	}
 
-	public static void display(TestBoard b) {
-		if (b.getPieces().size() == 0) {
+	@Test
+	public void testFENClocks() {
+		// blank the test board
+		b = new TestBoard();
+
+		// create a standard board
+		Board board = new Board();
+
+		assertTrue(board.getFEN().endsWith("0 1"));
+		board.move(6, 4, 4, 4);
+		assertTrue(board.getFEN().endsWith("0 1"));
+		board.move(1, 1, 3, 1);
+		assertTrue(board.getFEN().endsWith("0 2"));
+		board.move(7, 6, 5, 5);
+		assertTrue(board.getFEN().endsWith("1 2"));
+	}
+
+	public static void display(Board displayboard) {
+		if (displayboard.getPieces().size() == 0) {
 			return;
 		}
-		JOptionPane.showMessageDialog(null, new ChessView(b), "Error Display View", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(null, new ChessView(displayboard), "Error Display View",
+				JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static void display(String str) {
