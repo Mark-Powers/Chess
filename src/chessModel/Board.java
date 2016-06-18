@@ -278,7 +278,7 @@ public class Board {
 	}
 
 	public String getFEN() {
-		// rnbqkb1r/pp1p1ppp/5n2/2p1p3/2P1P3/5N2/PP1P1PPP/RNBQKB1R w KQkq c6 0 4
+		// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 		StringBuilder fen = new StringBuilder();
 		for (int y = 0; y < boardHeight; y++) {
@@ -287,8 +287,8 @@ public class Board {
 				if (p == null) {
 					int start = x;
 					x++;
-					while (p == null && x < boardWidth){
-						p = getPiece(y,x);
+					while (p == null && x < boardWidth) {
+						p = getPiece(y, x);
 						x++;
 					}
 					fen.append(x - start);
@@ -301,6 +301,34 @@ public class Board {
 			}
 		}
 
+		fen.append(" ");
+		if (Log.getLogArray().size() % 2 == 1) {
+			fen.append("w");
+		} else {
+			fen.append("b");
+		}
+		fen.append(" ");
+
+		// TODO calculate castling availability
+		fen.append("KQkq");
+
+		fen.append(" ");
+
+		// TODO en passant target square
+		fen.append("-");
+
+		fen.append(" ");
+
+		// Halfmove clock: This is the number of halfmoves since the last
+		// capture or pawn advance. This is used to determine if a draw can
+		// be claimed under the fifty-move rule.
+		fen.append("0");
+		fen.append(" ");
+
+		// Fullmove number: The number of the full move. It starts at 1, and
+		// is incremented after Black's move.
+		fen.append("1");
+		
 		return fen.toString();
 	}
 
