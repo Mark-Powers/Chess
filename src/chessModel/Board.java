@@ -1,12 +1,13 @@
 package chessModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Board {
 	public final int boardWidth;
 	public final int boardHeight;
-	private ArrayList<Piece> pieces = new ArrayList<Piece>();
-	private ArrayList<Integer[]> movelog;
+	protected ArrayList<Piece> pieces = new ArrayList<Piece>();
+	private Log movelog;
 	private int whiteScore;
 	private int blackScore;
 
@@ -16,26 +17,26 @@ public class Board {
 		whiteScore = 0;
 		blackScore = 0;
 		for (int i = 0; i < 8; i++) {
-			pieces.add(new Pawn(1, i, 0));
-			pieces.add(new Pawn(6, i, 1));
+			pieces.add(new Pawn(1, i, 1));
+			pieces.add(new Pawn(6, i, 0));
 		}
-		pieces.add(new Rook(0, 0, 0));
-		pieces.add(new Rook(0, 7, 0));
-		pieces.add(new Rook(7, 0, 1));
-		pieces.add(new Rook(7, 7, 1));
-		pieces.add(new Knight(0, 1, 0));
-		pieces.add(new Knight(0, 6, 0));
-		pieces.add(new Knight(7, 1, 1));
-		pieces.add(new Knight(7, 6, 1));
-		pieces.add(new Bishop(0, 2, 0));
-		pieces.add(new Bishop(0, 5, 0));
-		pieces.add(new Bishop(7, 2, 1));
-		pieces.add(new Bishop(7, 5, 1));
-		pieces.add(new Queen(0, 3, 0));
-		pieces.add(new Queen(7, 3, 1));
-		pieces.add(new King(0, 4, 0));
-		pieces.add(new King(7, 4, 1));
-		movelog = new ArrayList<Integer[]>();
+		pieces.add(new Rook(0, 0, 1));
+		pieces.add(new Rook(0, 7, 1));
+		pieces.add(new Rook(7, 0, 0));
+		pieces.add(new Rook(7, 7, 0));
+		pieces.add(new Knight(0, 1, 1));
+		pieces.add(new Knight(0, 6, 1));
+		pieces.add(new Knight(7, 1, 0));
+		pieces.add(new Knight(7, 6, 0));
+		pieces.add(new Bishop(0, 2, 1));
+		pieces.add(new Bishop(0, 5, 1));
+		pieces.add(new Bishop(7, 2, 0));
+		pieces.add(new Bishop(7, 5, 0));
+		pieces.add(new Queen(0, 3, 1));
+		pieces.add(new Queen(7, 3, 0));
+		pieces.add(new King(0, 4, 1));
+		pieces.add(new King(7, 4, 0));
+		movelog = new Log();
 	}
 
 	public boolean move(int oldX, int oldY, int x, int y) {
@@ -56,7 +57,8 @@ public class Board {
 				}
 			}
 
-			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status) && !isObstructed(selectedP, x, y)) {
+			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
+					&& !isObstructed(selectedP, x, y)) {
 				if (isInCheck(selectedP.getSide())) {
 					System.out.println("test");
 					if (!resolvesCheck(selectedP, x, y)) {
@@ -79,7 +81,7 @@ public class Board {
 				numsForLog[1] = oldY;
 				numsForLog[2] = x;
 				numsForLog[3] = y;
-				movelog.add(numsForLog);
+				movelog.addToLog(oldX, oldY, x, y);
 				return true;
 			}
 		}
@@ -140,8 +142,7 @@ public class Board {
 					}
 				}
 				if (!wasPrinted) {
-					if ((i % 2 == 0 && u % 2 == 0)
-							|| (i % 2 != 0 && u % 2 != 0))
+					if ((i % 2 == 0 && u % 2 == 0) || (i % 2 != 0 && u % 2 != 0))
 						board += ("O");
 					else
 						board += ("O");
@@ -155,7 +156,8 @@ public class Board {
 
 	public boolean isThreatenedSquare(int x, int y, int side) {
 		for (Piece p : pieces) {
-			if (p.getSide() != side) { // Only the other team can threaten a square for any given side
+			if (p.getSide() != side) { // Only the other team can threaten a
+										// square for any given side
 				SquareStatus squareToCheck = getSquareStatus(x, y, p.getSide());
 				if (p.validMove(x, y, squareToCheck) && !isObstructed(p, x, y)) {
 					return true;
@@ -166,7 +168,8 @@ public class Board {
 	}
 
 	/**
-	 * @param side The side testing for check
+	 * @param side
+	 *            The side testing for check
 	 * @return If the side given is in check
 	 */
 	public boolean isInCheck(int side) {
@@ -187,11 +190,12 @@ public class Board {
 	 */
 	public boolean resolvesCheck(Piece p, int x, int y) {
 		Board b = new Board();
-		for(Integer[] move : movelog){
+		for (Integer[] move : movelog.getLogArray()) {
 			b.move(move[0], move[1], move[2], move[3]);
 		}
-		b.getPiece(p.getX(), p.getY()).forceMove(x, y);;
-		if(b.isInCheck(p.side)){
+		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
+		;
+		if (b.isInCheck(p.side)) {
 			System.out.println("still in check");
 			return false;
 		}
@@ -219,8 +223,10 @@ public class Board {
 	}
 
 	/**
-	 * @param x The x coordinate of the piece to find 
-	 * @param y The y coordinate of the piece to find
+	 * @param x
+	 *            The x coordinate of the piece to find
+	 * @param y
+	 *            The y coordinate of the piece to find
 	 * @return The piece at coordinates (x, y), or null if there is no piece
 	 */
 	public Piece getPiece(int x, int y) {
@@ -245,9 +251,7 @@ public class Board {
 		for (int i = 0; i < boardHeight; i++) {
 			for (int u = 0; u < boardWidth; u++) {
 				SquareStatus status = getSquareStatus(u, i, p.getSide());
-				if (!status.equals(SquareStatus.TEAM)
-						&& p.validMove(u, i, status)
-						&& !isObstructed(p, u, i)) {
+				if (!status.equals(SquareStatus.TEAM) && p.validMove(u, i, status) && !isObstructed(p, u, i)) {
 					moveList[0] = p.getX();
 					moveList[1] = p.getY();
 					moveList[2] = u;
@@ -259,7 +263,7 @@ public class Board {
 	}
 
 	public ArrayList<Integer[]> getMoveLog() {
-		return movelog;
+		return movelog.getLogArray();
 	}
 
 	public int getWhiteScore() {
@@ -269,6 +273,75 @@ public class Board {
 	public int getBlackScore() {
 		return blackScore;
 	}
+
+	public String getPGN() {
+		return movelog.toString();
+	}
+
+	public String getFEN() {
+		// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+		StringBuilder fen = new StringBuilder();
+		for (int y = 0; y < boardHeight; y++) {
+			for (int x = 0; x < boardWidth; x++) {
+				Piece p = getPiece(y, x);
+				if (p == null) {
+					int start = x;
+					x++;
+					while (p == null && x < boardWidth) {
+						p = getPiece(y, x);
+						x++;
+					}
+					fen.append(x - start);
+				} else {
+					fen.append(p.getChar());
+				}
+			}
+			if (y < boardHeight - 1) {
+				fen.append("/");
+			}
+		}
+
+		fen.append(" ");
+		if (Log.getLogArray().size() % 2 == 1) {
+			fen.append("w");
+		} else {
+			fen.append("b");
+		}
+		fen.append(" ");
+
+		// TODO calculate castling availability
+		fen.append("KQkq");
+
+		fen.append(" ");
+
+		// TODO en passant target square
+		fen.append("-");
+
+		fen.append(" ");
+
+		// Halfmove clock: This is the number of halfmoves since the last
+		// capture or pawn advance. This is used to determine if a draw can
+		// be claimed under the fifty-move rule.
+		fen.append("0");
+		fen.append(" ");
+
+		// Fullmove number: The number of the full move. It starts at 1, and
+		// is incremented after Black's move.
+		fen.append("1");
+		return fen.toString();
+	}
 	
-	
+	public String getLogRaw(){
+		ArrayList<Integer[]> arr = Log.getLogArray();
+		StringBuilder sb = new StringBuilder();
+		for (Integer[] integers : arr) {
+			sb.append(integers[0] + ",");
+			sb.append(integers[1] + ",");
+			sb.append(integers[2] + ",");
+			sb.append(integers[3] + "\n");
+		}
+		return sb.toString();
+	}
+
 }
