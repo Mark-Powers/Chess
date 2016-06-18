@@ -186,7 +186,7 @@ public class BoardTests {
 	@Test
 	public void testBasicMove() {
 		b = new TestBoard();
-		Piece pawn = new Pawn(6, 5, 1);
+		Piece pawn = new Pawn(6, 5, 0);
 		b.addPiece(pawn);
 		b.move(6, 5, 4, 5);
 		assertEquals(b.getPiece(4, 5), pawn);

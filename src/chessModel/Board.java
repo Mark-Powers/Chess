@@ -304,9 +304,9 @@ public class Board {
 
 		fen.append(" ");
 		if (Log.getLogArray().size() % 2 == 1) {
-			fen.append("b");
-		} else {
 			fen.append("w");
+		} else {
+			fen.append("b");
 		}
 		fen.append(" ");
 
