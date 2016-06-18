@@ -1,6 +1,7 @@
 package chessViewController;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -144,14 +145,19 @@ public class GraphicsGUI extends JFrame {
 				JPanel p = new JPanel();
 				p.setLayout(new BorderLayout());
 				
-				JTextArea pgn = new JTextArea(b.getPGN());
+				JTextArea pgn = new JTextArea("PGN:\n"+b.getPGN());
 				pgn.setEditable(false);
 				
-				JTextArea fen = new JTextArea(b.getFEN());
+				JTextArea fen = new JTextArea("Fen:\n"+b.getFEN());
 				fen.setEditable(false);
+				fen.setBackground(Color.lightGray);
+				
+				JTextArea raw = new JTextArea("Raw Moves:\n"+b.getLogRaw());
+				raw.setEditable(false);
 				
 				p.add(pgn, BorderLayout.NORTH);
 				p.add(fen, BorderLayout.CENTER);
+				p.add(raw, BorderLayout.SOUTH);
 				
 				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}

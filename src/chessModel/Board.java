@@ -1,6 +1,7 @@
 package chessModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Board {
 	public final int boardWidth;
@@ -303,9 +304,9 @@ public class Board {
 
 		fen.append(" ");
 		if (Log.getLogArray().size() % 2 == 1) {
-			fen.append("w");
-		} else {
 			fen.append("b");
+		} else {
+			fen.append("w");
 		}
 		fen.append(" ");
 
@@ -328,8 +329,19 @@ public class Board {
 		// Fullmove number: The number of the full move. It starts at 1, and
 		// is incremented after Black's move.
 		fen.append("1");
-		
 		return fen.toString();
+	}
+	
+	public String getLogRaw(){
+		ArrayList<Integer[]> arr = Log.getLogArray();
+		StringBuilder sb = new StringBuilder();
+		for (Integer[] integers : arr) {
+			sb.append(integers[0] + ",");
+			sb.append(integers[1] + ",");
+			sb.append(integers[2] + ",");
+			sb.append(integers[3] + "\n");
+		}
+		return sb.toString();
 	}
 
 }
