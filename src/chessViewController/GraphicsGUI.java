@@ -47,6 +47,7 @@ public class GraphicsGUI extends JFrame {
 	}
 
 	public GraphicsGUI() {
+		
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
 
@@ -163,28 +164,18 @@ public class GraphicsGUI extends JFrame {
 			}
 		});
 
-		chessView.addMouseListener(new MouseAdapter() {
+		MouseAdapter humanInput = new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				int cellSize = chessView.getCellSize();
 				int xLoc = (e.getY()) / cellSize;
 				int yLoc = (e.getX()) / cellSize;
-				if (chessView.getSelected() != null) {
-					g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
-					chessView.setSelected(null);
-					chessView.repaint();
-				} else {
-					Piece p = g.getBoard().getPiece(xLoc, yLoc);
-					if (p == null) {
-						chessView.setSelected(null);
-					} else if (p.equals(chessView.getSelected())) {
-						chessView.setSelected(null);
-					} else {
-						chessView.setSelected(p);
-					}
-					chessView.repaint();
+				if (g.isHumanInputEnabled()){
+					handleLocationClicked(xLoc, yLoc);
 				}
 			}
-		});
+		};
+		
+		chessView.addMouseListener(humanInput);
 	}
 	
 	public void isOver(){
@@ -194,6 +185,29 @@ public class GraphicsGUI extends JFrame {
 			JOptionPane.showMessageDialog(this, "It's a draw!");
 		} else if(g.getPlayer1Time().equals("0:0") || g.getPlayer2Time().equals("0:0")){
 			JOptionPane.showMessageDialog(this, "Time's Up!");
+		}
+	}
+
+	/**
+	 * @param xLoc
+	 * @param yLoc
+	 */
+	private void handleLocationClicked(int xLoc, int yLoc) {
+		if (chessView.getSelected() != null) {
+			g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
+			chessView.setSelected(null);
+			chessView.repaint();
+			g.gameLoop();
+		} else {
+			Piece p = g.getBoard().getPiece(xLoc, yLoc);
+			if (p == null) {
+				chessView.setSelected(null);
+			} else if (p.equals(chessView.getSelected())) {
+				chessView.setSelected(null);
+			} else {
+				chessView.setSelected(p);
+			}
+			chessView.repaint();
 		}
 	}
 }
