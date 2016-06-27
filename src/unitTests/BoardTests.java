@@ -20,6 +20,7 @@ import chessModel.Knight;
 import chessModel.Pawn;
 import chessModel.Piece;
 import chessModel.Rook;
+import chessModel.SquareStatus;
 import chessModel.TestBoard;
 import chessViewController.ChessView;
 
@@ -185,10 +186,28 @@ public class BoardTests {
 	@Test
 	public void testBasicMove() {
 		b = new TestBoard();
-		Piece pawn = new Pawn(6, 5, 1);
+		Piece pawn = new Pawn(6, 5, 0);
 		b.addPiece(pawn);
 		b.move(6, 5, 4, 5);
 		assertEquals(b.getPiece(4, 5), pawn);
+	}
+	
+	@Test
+	public void testPawnMovement() {
+		b = new TestBoard();
+		Piece pawn = new Pawn(6, 5, 0);
+		b.addPiece(pawn);
+		assertTrue(pawn.validMove(4, 5, SquareStatus.EMPTY));
+		assertTrue(pawn.validMove(5, 5, SquareStatus.EMPTY));
+		
+		b = new TestBoard();
+		pawn = new Pawn(6, 5, 0);
+		assertTrue(pawn.validMove(5, 4, SquareStatus.ENEMY));
+		assertTrue(pawn.validMove(5, 6, SquareStatus.ENEMY));
+		b.addPiece(pawn);
+		b.addPiece(new Pawn(5,4,1));
+		b.move(6, 5, 5, 4);
+		assertEquals(b.getPiece(5, 4),pawn);
 	}
 
 	@Test
