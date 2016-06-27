@@ -5,31 +5,38 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Log {
+	
+	private int fullMoveClock;
 
-	private static ArrayList<Integer[]> logArr = new ArrayList<Integer[]>();
+	private ArrayList<Integer[]> logArr = new ArrayList<Integer[]>();
 
-	public static ArrayList<Integer[]> getLogArray() {
+	public ArrayList<Integer[]> getLogArray() {
 		return logArr;
 	}
 
 	public void addToLog(int oldX, int oldY, int x, int y) {
+		int side = logArr.size()%2;
 		Integer[] numsForLog = new Integer[4];
 		numsForLog[0] = oldX;
 		numsForLog[1] = oldY;
 		numsForLog[2] = x;
 		numsForLog[3] = y;
 		logArr.add(numsForLog);
+		if (side == 1){
+			fullMoveClock++;
+		}
+		
 	}
 
 	public String toString() {
-		return Log.toPGN(this);
+		return toPGN();
 	}
 
 	public static char convertChar(int val) {
 		return (char) (val + 97);
 	}
 
-	public static String toPGN(Log l) {
+	public String toPGN() {
 		StringBuilder logText = new StringBuilder();
 		logText.append("[Date \"" + new SimpleDateFormat("YYYY:MM:dd").format(new Date()) + "\"]\r\n");
 		logText.append("[Time \"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\"]\r\n\r\n");

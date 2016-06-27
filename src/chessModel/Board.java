@@ -318,7 +318,7 @@ public class Board {
 		}
 
 		fen.append(" ");
-		if (Log.getLogArray().size() % 2 == 1) {
+		if (movelog.getLogArray().size() % 2 == 1) {
 			fen.append("w");
 		} else {
 			fen.append("b");
@@ -348,7 +348,7 @@ public class Board {
 	}
 
 	public String getLogRaw() {
-		ArrayList<Integer[]> arr = Log.getLogArray();
+		ArrayList<Integer[]> arr = movelog.getLogArray();
 		StringBuilder sb = new StringBuilder();
 		for (Integer[] integers : arr) {
 			sb.append(integers[0] + ",");
@@ -359,6 +359,10 @@ public class Board {
 		return sb.toString();
 	}
 
+	/**
+	 * Returns if the pieces have moved yet
+	 * @return a string which FEN can use to determine availability of castling
+	 */
 	public String castlingAvailability() {
 		StringBuilder castling = new StringBuilder();
 		if (!whiteKing.hasMoved()) {
