@@ -2,7 +2,13 @@ package chessModel;
 
 import java.util.ArrayList;
 
+import chessModel.piece.Bishop;
+import chessModel.piece.King;
+import chessModel.piece.Knight;
+import chessModel.piece.Pawn;
 import chessModel.piece.Piece;
+import chessModel.piece.Queen;
+import chessModel.piece.Rook;
 
 public class TestBoard extends Board {
 	public TestBoard() {

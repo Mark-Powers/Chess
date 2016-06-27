@@ -1,7 +1,6 @@
 package chessModel;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import chessModel.piece.Bishop;
 import chessModel.piece.King;
@@ -18,6 +17,8 @@ public class Board {
 	private Log movelog;
 	private int whiteScore;
 	private int blackScore;
+	private Rook blackKingSide, whiteKingSide, blackQueenSide, whiteQueenSide;
+	private King blackKing, whiteKing;
 
 	public Board() {
 		boardWidth = 8;
@@ -28,10 +29,14 @@ public class Board {
 			pieces.add(new Pawn(1, i, 1));
 			pieces.add(new Pawn(6, i, 0));
 		}
-		pieces.add(new Rook(0, 0, 1));
-		pieces.add(new Rook(0, 7, 1));
-		pieces.add(new Rook(7, 0, 0));
-		pieces.add(new Rook(7, 7, 0));
+		blackQueenSide = new Rook(0, 0, 1);
+		pieces.add(blackQueenSide);
+		blackKingSide = new Rook(0, 7, 1);
+		pieces.add(blackKingSide);
+		whiteQueenSide = new Rook(7, 0, 0);
+		pieces.add(whiteQueenSide);
+		whiteKingSide = new Rook(7, 7, 0);
+		pieces.add(whiteKingSide);
 		pieces.add(new Knight(0, 1, 1));
 		pieces.add(new Knight(0, 6, 1));
 		pieces.add(new Knight(7, 1, 0));
@@ -42,8 +47,10 @@ public class Board {
 		pieces.add(new Bishop(7, 5, 0));
 		pieces.add(new Queen(0, 3, 1));
 		pieces.add(new Queen(7, 3, 0));
-		pieces.add(new King(0, 4, 1));
-		pieces.add(new King(7, 4, 0));
+		whiteKing = new King(0, 4, 1);
+		pieces.add(whiteKing);
+		blackKing = new King(7, 4, 0);
+		pieces.add(blackKing);
 		movelog = new Log();
 	}
 
@@ -319,7 +326,7 @@ public class Board {
 		fen.append(" ");
 
 		// TODO calculate castling availability
-		fen.append("KQkq");
+		fen.append(castlingAvailability());
 
 		fen.append(" ");
 
@@ -339,8 +346,8 @@ public class Board {
 		fen.append("1");
 		return fen.toString();
 	}
-	
-	public String getLogRaw(){
+
+	public String getLogRaw() {
 		ArrayList<Integer[]> arr = Log.getLogArray();
 		StringBuilder sb = new StringBuilder();
 		for (Integer[] integers : arr) {
@@ -350,6 +357,31 @@ public class Board {
 			sb.append(integers[3] + "\n");
 		}
 		return sb.toString();
+	}
+
+	public String castlingAvailability() {
+		StringBuilder castling = new StringBuilder();
+		if (!whiteKing.hasMoved()) {
+			if (!whiteKingSide.hasMoved()) {
+				castling.append("K");
+			}
+			if (!whiteQueenSide.hasMoved()) {
+				castling.append("Q");
+			}
+		}
+		if (!blackKing.hasMoved()) {
+			if (!blackKingSide.hasMoved()) {
+				castling.append("k");
+			}
+			if (!blackQueenSide.hasMoved()) {
+				castling.append("q");
+			}
+		}
+		if (castling.toString().isEmpty()) {
+			return "-";
+		} else {
+			return castling.toString();
+		}
 	}
 
 }
