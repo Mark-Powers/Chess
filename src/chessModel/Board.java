@@ -2,6 +2,8 @@ package chessModel;
 
 import java.util.ArrayList;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import chessModel.piece.Bishop;
 import chessModel.piece.King;
 import chessModel.piece.Knight;
@@ -9,6 +11,7 @@ import chessModel.piece.Pawn;
 import chessModel.piece.Piece;
 import chessModel.piece.Queen;
 import chessModel.piece.Rook;
+import util.ChessUtil;
 
 public class Board {
 	public final int boardWidth;
@@ -19,6 +22,7 @@ public class Board {
 	private int blackScore;
 	private Rook blackKingSide, whiteKingSide, blackQueenSide, whiteQueenSide;
 	private King blackKing, whiteKing;
+	private String enPassantTarget;
 
 	public Board() {
 		boardWidth = 8;
@@ -51,6 +55,8 @@ public class Board {
 		pieces.add(whiteKing);
 		blackKing = new King(7, 4, 0);
 		pieces.add(blackKing);
+
+		enPassantTarget = "";
 		movelog = new Log();
 	}
 
@@ -60,6 +66,9 @@ public class Board {
 		SquareStatus status = SquareStatus.EMPTY;
 		// Sets selectedP to the right piece
 		selectedP = getPiece(oldX, oldY);
+		
+		// create a row-file string for the place the piece is moving to
+		String selectedPLocationString = ChessUtil.convertChar(y) + "" + ChessUtil.convertRow(x);
 
 		if (selectedP != null) {
 			otherP = getPiece(x, y);
@@ -71,6 +80,17 @@ public class Board {
 					status = SquareStatus.ENEMY;
 				}
 			}
+			
+			System.out.println(enPassantTarget + " " + selectedPLocationString);
+			if (selectedPLocationString.equals(enPassantTarget)){
+				status = SquareStatus.ENEMY;
+				if (selectedP.getSide() == 0){
+					otherP = getPiece(x + 1, y);
+				} else {
+					otherP = getPiece(x - 1, y);
+				}
+			}
+			
 
 			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
@@ -81,10 +101,21 @@ public class Board {
 					}
 				}
 				selectedP.move(x, y, status);
-				if (selectedP instanceof Pawn){
+				
+				
+				
+				if (selectedP instanceof Pawn) {
 					movelog.resetHalfMoveClock();
+					Pawn pawn = (Pawn) selectedP;
+					if (Math.abs(oldX - x) == 2) {
+						enPassantTarget = ChessUtil.convertChar(y)
+								+ String.valueOf(ChessUtil.convertRow((oldX + x) / 2));
+					} else {
+						enPassantTarget = "";
+					}
 				} else {
 					movelog.incrementHalfMoveClock();
+					enPassantTarget = "";
 				}
 				if (status.equals(SquareStatus.ENEMY)) {
 					int scoreEarned = otherP.getValue();
@@ -307,13 +338,14 @@ public class Board {
 				Piece p = getPiece(y, x);
 				if (p == null) {
 					int start = x;
-					x++;
+
 					while (p == null && x < boardWidth) {
-						p = getPiece(y, x);
 						x++;
+						p = getPiece(y, x);
 					}
 					fen.append(x - start);
-				} else {
+				}
+				if (p != null) {
 					fen.append(p.getChar());
 				}
 			}
@@ -324,9 +356,9 @@ public class Board {
 
 		fen.append(" ");
 		if (movelog.getLogArray().size() % 2 == 1) {
-			fen.append("w");
-		} else {
 			fen.append("b");
+		} else {
+			fen.append("w");
 		}
 		fen.append(" ");
 
@@ -334,8 +366,11 @@ public class Board {
 
 		fen.append(" ");
 
-		// TODO en passant target square
-		fen.append("-");
+		if (enPassantTarget.isEmpty()) {
+			fen.append("-");
+		} else {
+			fen.append(enPassantTarget);
+		}
 
 		fen.append(" ");
 
@@ -365,6 +400,7 @@ public class Board {
 
 	/**
 	 * Returns if the pieces have moved yet
+	 * 
 	 * @return a string which FEN can use to determine availability of castling
 	 */
 	public String castlingAvailability() {

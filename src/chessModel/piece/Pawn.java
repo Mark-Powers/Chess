@@ -44,5 +44,9 @@ public class Pawn extends Piece {
 	public int getValue() {
 		return 1;
 	}
+	
+	public boolean hasTakenFirstMove(){
+		return hasTakenFirstMove;
+	}
 
 }

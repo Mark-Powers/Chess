@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import util.ChessUtil;
+
 public class Log {
 	
 	private int fullMoveClock, halfMoveClock;
@@ -45,10 +47,6 @@ public class Log {
 		return toPGN();
 	}
 
-	public static char convertChar(int val) {
-		return (char) (val + 97);
-	}
-
 	public String toPGN() {
 		StringBuilder logText = new StringBuilder();
 		logText.append("[Date \"" + new SimpleDateFormat("YYYY:MM:dd").format(new Date()) + "\"]\r\n");
@@ -63,10 +61,10 @@ public class Log {
 				logText.append(turnNo + ". ");
 			}
 			
-			logText.append(convertChar(nums[0]));
+			logText.append(ChessUtil.convertChar(nums[0]));
 			logText.append(nums[1] + 1);
 			logText.append("-");
-			logText.append(convertChar(nums[2]));
+			logText.append(ChessUtil.convertChar(nums[2]));
 			logText.append(nums[3] + 1);
 			logText.append(" ");
 			if (moveNo % 4 == 0 && side == 1) {
