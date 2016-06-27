@@ -13,15 +13,15 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import chessModel.Bishop;
 import chessModel.Board;
-import chessModel.King;
-import chessModel.Knight;
-import chessModel.Pawn;
-import chessModel.Piece;
-import chessModel.Rook;
 import chessModel.SquareStatus;
 import chessModel.TestBoard;
+import chessModel.piece.Bishop;
+import chessModel.piece.King;
+import chessModel.piece.Knight;
+import chessModel.piece.Pawn;
+import chessModel.piece.Piece;
+import chessModel.piece.Rook;
 import chessViewController.ChessView;
 
 public class BoardTests {

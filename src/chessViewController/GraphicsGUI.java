@@ -29,7 +29,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
-import chessModel.Piece;
+import chessModel.piece.Piece;
 
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;

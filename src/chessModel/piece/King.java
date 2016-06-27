@@ -1,8 +1,11 @@
-package chessModel;
-public class Rook extends Piece
+package chessModel.piece;
+
+import chessModel.SquareStatus;
+
+public class King extends Piece
 {
 	boolean canCastle;
-    public Rook(int x, int y, int side)
+    public King(int x, int y, int side)
     {
         this.x = x;
         this.y = y;
@@ -11,8 +14,8 @@ public class Rook extends Piece
     }
     public String getChar(){
         if(side==0)
-            return "R";
-        return "r";
+            return "K";
+        return "k";
     }
     public boolean move(int x, int y, SquareStatus status){
     	if(validMove(x, y, status)){
@@ -24,9 +27,9 @@ public class Rook extends Piece
     	return false;
     }
     public boolean validMove(int x, int y, SquareStatus status){
-        return ( (this.x==x || this.y==y) && x!=y);
+        return (Math.abs(this.x-x)<=1 && Math.abs(this.y-y)<=1);
     }
     public int getValue(){
-    	return 5;
+    	return 1000;
     }
 }

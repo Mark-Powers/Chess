@@ -1,4 +1,7 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
+
 public abstract class Piece
 {
     protected int x;    
