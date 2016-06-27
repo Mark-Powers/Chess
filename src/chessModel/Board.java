@@ -81,6 +81,11 @@ public class Board {
 					}
 				}
 				selectedP.move(x, y, status);
+				if (selectedP instanceof Pawn){
+					movelog.resetHalfMoveClock();
+				} else {
+					movelog.incrementHalfMoveClock();
+				}
 				if (status.equals(SquareStatus.ENEMY)) {
 					int scoreEarned = otherP.getValue();
 					if (selectedP.getSide() == 0) {
@@ -89,7 +94,7 @@ public class Board {
 						blackScore += scoreEarned;
 					}
 					pieces.remove(otherP);
-
+					movelog.resetHalfMoveClock();
 				}
 				Integer[] numsForLog = new Integer[4];
 				numsForLog[0] = oldX;
@@ -325,7 +330,6 @@ public class Board {
 		}
 		fen.append(" ");
 
-		// TODO calculate castling availability
 		fen.append(castlingAvailability());
 
 		fen.append(" ");
@@ -338,12 +342,12 @@ public class Board {
 		// Halfmove clock: This is the number of halfmoves since the last
 		// capture or pawn advance. This is used to determine if a draw can
 		// be claimed under the fifty-move rule.
-		fen.append("0");
+		fen.append(movelog.getHalfMoveCount());
 		fen.append(" ");
 
 		// Fullmove number: The number of the full move. It starts at 1, and
 		// is incremented after Black's move.
-		fen.append("1");
+		fen.append(movelog.getFullMoveCount());
 		return fen.toString();
 	}
 

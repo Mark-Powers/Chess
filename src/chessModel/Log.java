@@ -6,10 +6,16 @@ import java.util.Date;
 
 public class Log {
 	
-	private int fullMoveClock;
+	private int fullMoveClock, halfMoveClock;
 
-	private ArrayList<Integer[]> logArr = new ArrayList<Integer[]>();
+	private ArrayList<Integer[]> logArr;
 
+	public Log(){
+		logArr = new ArrayList<Integer[]>();
+		fullMoveClock = 1;
+		halfMoveClock = 0;
+	}
+	
 	public ArrayList<Integer[]> getLogArray() {
 		return logArr;
 	}
@@ -25,7 +31,14 @@ public class Log {
 		if (side == 1){
 			fullMoveClock++;
 		}
-		
+	}
+	
+	public void resetHalfMoveClock(){
+		halfMoveClock = 0;
+	}
+	
+	public void incrementHalfMoveClock(){
+		halfMoveClock++;
 	}
 
 	public String toString() {
@@ -62,6 +75,14 @@ public class Log {
 			moveNo++;
 		}
 		return logText.toString();
+	}
+	
+	public int getFullMoveCount(){
+		return fullMoveClock;
+	}
+
+	public int getHalfMoveCount() {
+		return halfMoveClock;
 	}
 
 }
