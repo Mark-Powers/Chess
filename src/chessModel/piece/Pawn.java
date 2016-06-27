@@ -1,4 +1,6 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
 
 public class Pawn extends Piece {
 	private boolean hasTakenFirstMove;

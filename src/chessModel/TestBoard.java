@@ -2,6 +2,8 @@ package chessModel;
 
 import java.util.ArrayList;
 
+import chessModel.piece.Piece;
+
 public class TestBoard extends Board {
 	public TestBoard(){
 		super();

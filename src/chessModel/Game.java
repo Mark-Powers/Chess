@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
+import chessModel.piece.Piece;
+
 public class Game {
 	private int currentSide;
 	private Board board;

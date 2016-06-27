@@ -3,6 +3,14 @@ package chessModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import chessModel.piece.Bishop;
+import chessModel.piece.King;
+import chessModel.piece.Knight;
+import chessModel.piece.Pawn;
+import chessModel.piece.Piece;
+import chessModel.piece.Queen;
+import chessModel.piece.Rook;
+
 public class Board {
 	public final int boardWidth;
 	public final int boardHeight;
@@ -135,7 +143,7 @@ public class Board {
 			for (int u = 0; u < boardWidth; u++) {
 				wasPrinted = false;
 				for (Piece piece : pieces) {
-					if (piece.x == i && piece.y == u) {
+					if (piece.getX() == i && piece.getY() == u) {
 						board += (piece.getChar());
 						wasPrinted = true;
 						break;
@@ -195,7 +203,7 @@ public class Board {
 		}
 		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
 		;
-		if (b.isInCheck(p.side)) {
+		if (b.isInCheck(p.getSide())) {
 			System.out.println("still in check");
 			return false;
 		}
@@ -231,7 +239,7 @@ public class Board {
 	 */
 	public Piece getPiece(int x, int y) {
 		for (Piece piece : pieces) {
-			if (x == piece.x && y == piece.y) {
+			if (x == piece.getX() && y == piece.getY()) {
 				return piece;
 			}
 		}
