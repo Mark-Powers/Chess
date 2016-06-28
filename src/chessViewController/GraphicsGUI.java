@@ -1,6 +1,7 @@
 package chessViewController;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -20,6 +21,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -32,7 +34,7 @@ import chessModel.Piece;
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
-	private JMenuItem save;
+	private JMenuItem save, details;
 	private Game g;
 	private ChessView chessView;
 	JLabel timer1Label;
@@ -62,13 +64,15 @@ public class GraphicsGUI extends JFrame {
 		menu = new JMenuBar();
 		file = new JMenu("File");
 		save = new JMenuItem("Save...");
+		details = new JMenuItem("View...");
 		menu.add(file);
 		file.add(save);
+		file.add(details);
 
 		this.setJMenuBar(menu);
 		
 		g = new Game();
-		Board b = g.getBoard();
+		final Board b = g.getBoard();
 
 		chessView = new ChessView(b);
 		
@@ -125,17 +129,37 @@ public class GraphicsGUI extends JFrame {
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					StringBuilder log = new StringBuilder();
-					for (Integer[] nums : g.getBoard().getMoveLog()) {
-						for (int i = 0; i < nums.length; i++) {
-							log.append(nums[i]);
-						}
-						log.append("\r\n");
-					}
+					log.append(b.getPGN());
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to write file");
 				}
+			}
+		});
+		
+		details.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPanel p = new JPanel();
+				p.setLayout(new BorderLayout());
+				
+				JTextArea pgn = new JTextArea("PGN:\n"+b.getPGN());
+				pgn.setEditable(false);
+				
+				JTextArea fen = new JTextArea("Fen:\n"+b.getFEN());
+				fen.setEditable(false);
+				fen.setBackground(Color.lightGray);
+				
+				JTextArea raw = new JTextArea("Raw Moves:\n"+b.getLogRaw());
+				raw.setEditable(false);
+				
+				p.add(pgn, BorderLayout.NORTH);
+				p.add(fen, BorderLayout.CENTER);
+				p.add(raw, BorderLayout.SOUTH);
+				
+				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 
