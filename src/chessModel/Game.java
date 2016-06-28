@@ -24,7 +24,9 @@ public class Game {
 		humanInputEnabled = false;
 				
 		player1 = new HumanPlayer("Human Player One", 0);
-		player2 = new DummyPlayer(board, 1);
+		
+		player2 = new HumanPlayer("Human Player Two", 1);
+		//player2 = new DummyPlayer(board, 1);
 		
 		board = new Board();
 		currentSide = 0;

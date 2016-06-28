@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +37,12 @@ public class BoardTests {
 	@BeforeClass
 	public static void setup() {
 		UIManager.put("OptionPane.minimumSize", new Dimension(400, 400));
+	}
+
+	@Before
+	public void beforeTest() {
+		// blank the test board
+		b = new TestBoard();
 	}
 
 	@Test
@@ -191,7 +198,7 @@ public class BoardTests {
 		b.move(6, 5, 4, 5);
 		assertEquals(b.getPiece(4, 5), pawn);
 	}
-	
+
 	@Test
 	public void testPawnMovement() {
 		b = new TestBoard();
@@ -199,22 +206,19 @@ public class BoardTests {
 		b.addPiece(pawn);
 		assertTrue(pawn.validMove(4, 5, SquareStatus.EMPTY));
 		assertTrue(pawn.validMove(5, 5, SquareStatus.EMPTY));
-		
+
 		b = new TestBoard();
 		pawn = new Pawn(6, 5, 0);
 		assertTrue(pawn.validMove(5, 4, SquareStatus.ENEMY));
 		assertTrue(pawn.validMove(5, 6, SquareStatus.ENEMY));
 		b.addPiece(pawn);
-		b.addPiece(new Pawn(5,4,1));
+		b.addPiece(new Pawn(5, 4, 1));
 		b.move(6, 5, 5, 4);
-		assertEquals(b.getPiece(5, 4),pawn);
+		assertEquals(b.getPiece(5, 4), pawn);
 	}
 
 	@Test
 	public void testFENStartPosition() {
-		// blank the test board
-		b = new TestBoard();
-
 		// create a standard board
 		Board board = new Board();
 
@@ -225,10 +229,31 @@ public class BoardTests {
 	}
 
 	@Test
-	public void testFENClocks() {
-		// blank the test board
-		b = new TestBoard();
+	public void testFENWithMovesFull() {
+		// create a standard board
+		Board board = new Board();
+		
+		assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.getFEN());
+		board.move(6,4,4,4);
+		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.getFEN());
+		board.move(1,2,3,2);
+		assertEquals("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board.getFEN());
+		board.move(7,6,5,5);
+		assertEquals("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2", board.getFEN());
+	}
+	
+	@Test
+	public void testEnPassant(){
+		Board board = new Board();
+		board.move(1,6,2,6);
+		board.move(4,1,3,1);
+		board.move(1,0,3,0);
+		board.move(3,1,2,0);
+		assertTrue(board.getPiece(2, 0)==null);
+	}
 
+	@Test
+	public void testFENClocks() {
 		// create a standard board
 		Board board = new Board();
 
