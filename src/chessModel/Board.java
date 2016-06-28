@@ -81,7 +81,6 @@ public class Board {
 				}
 			}
 			
-			System.out.println(enPassantTarget + " " + selectedPLocationString);
 			if (selectedPLocationString.equals(enPassantTarget)){
 				status = SquareStatus.ENEMY;
 				if (selectedP.getSide() == 0){
