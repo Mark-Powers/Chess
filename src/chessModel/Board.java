@@ -1,7 +1,17 @@
 package chessModel;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
+import chessModel.piece.Bishop;
+import chessModel.piece.King;
+import chessModel.piece.Knight;
+import chessModel.piece.Pawn;
+import chessModel.piece.Piece;
+import chessModel.piece.Queen;
+import chessModel.piece.Rook;
+import util.ChessUtil;
 
 public class Board {
 	public final int boardWidth;
@@ -10,6 +20,9 @@ public class Board {
 	private Log movelog;
 	private int whiteScore;
 	private int blackScore;
+	private Rook blackKingSide, whiteKingSide, blackQueenSide, whiteQueenSide;
+	private King blackKing, whiteKing;
+	private String enPassantTarget;
 
 	public Board() {
 		boardWidth = 8;
@@ -20,10 +33,14 @@ public class Board {
 			pieces.add(new Pawn(1, i, 1));
 			pieces.add(new Pawn(6, i, 0));
 		}
-		pieces.add(new Rook(0, 0, 1));
-		pieces.add(new Rook(0, 7, 1));
-		pieces.add(new Rook(7, 0, 0));
-		pieces.add(new Rook(7, 7, 0));
+		blackQueenSide = new Rook(0, 0, 1);
+		pieces.add(blackQueenSide);
+		blackKingSide = new Rook(0, 7, 1);
+		pieces.add(blackKingSide);
+		whiteQueenSide = new Rook(7, 0, 0);
+		pieces.add(whiteQueenSide);
+		whiteKingSide = new Rook(7, 7, 0);
+		pieces.add(whiteKingSide);
 		pieces.add(new Knight(0, 1, 1));
 		pieces.add(new Knight(0, 6, 1));
 		pieces.add(new Knight(7, 1, 0));
@@ -34,8 +51,12 @@ public class Board {
 		pieces.add(new Bishop(7, 5, 0));
 		pieces.add(new Queen(0, 3, 1));
 		pieces.add(new Queen(7, 3, 0));
-		pieces.add(new King(0, 4, 1));
-		pieces.add(new King(7, 4, 0));
+		whiteKing = new King(0, 4, 1);
+		pieces.add(whiteKing);
+		blackKing = new King(7, 4, 0);
+		pieces.add(blackKing);
+
+		enPassantTarget = "";
 		movelog = new Log();
 	}
 
@@ -45,6 +66,9 @@ public class Board {
 		SquareStatus status = SquareStatus.EMPTY;
 		// Sets selectedP to the right piece
 		selectedP = getPiece(oldX, oldY);
+		
+		// create a row-file string for the place the piece is moving to
+		String selectedPLocationString = ChessUtil.convertChar(y) + "" + ChessUtil.convertRow(x);
 
 		if (selectedP != null) {
 			otherP = getPiece(x, y);
@@ -56,6 +80,16 @@ public class Board {
 					status = SquareStatus.ENEMY;
 				}
 			}
+			
+			if (selectedPLocationString.equals(enPassantTarget)){
+				status = SquareStatus.ENEMY;
+				if (selectedP.getSide() == 0){
+					otherP = getPiece(x + 1, y);
+				} else {
+					otherP = getPiece(x - 1, y);
+				}
+			}
+			
 
 			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
@@ -66,6 +100,22 @@ public class Board {
 					}
 				}
 				selectedP.move(x, y, status);
+				
+				
+				
+				if (selectedP instanceof Pawn) {
+					movelog.resetHalfMoveClock();
+					Pawn pawn = (Pawn) selectedP;
+					if (Math.abs(oldX - x) == 2) {
+						enPassantTarget = ChessUtil.convertChar(y)
+								+ String.valueOf(ChessUtil.convertRow((oldX + x) / 2));
+					} else {
+						enPassantTarget = "";
+					}
+				} else {
+					movelog.incrementHalfMoveClock();
+					enPassantTarget = "";
+				}
 				if (status.equals(SquareStatus.ENEMY)) {
 					int scoreEarned = otherP.getValue();
 					if (selectedP.getSide() == 0) {
@@ -74,7 +124,7 @@ public class Board {
 						blackScore += scoreEarned;
 					}
 					pieces.remove(otherP);
-
+					movelog.resetHalfMoveClock();
 				}
 				Integer[] numsForLog = new Integer[4];
 				numsForLog[0] = oldX;
@@ -135,7 +185,7 @@ public class Board {
 			for (int u = 0; u < boardWidth; u++) {
 				wasPrinted = false;
 				for (Piece piece : pieces) {
-					if (piece.x == i && piece.y == u) {
+					if (piece.getX() == i && piece.getY() == u) {
 						board += (piece.getChar());
 						wasPrinted = true;
 						break;
@@ -195,7 +245,7 @@ public class Board {
 		}
 		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
 		;
-		if (b.isInCheck(p.side)) {
+		if (b.isInCheck(p.getSide())) {
 			System.out.println("still in check");
 			return false;
 		}
@@ -231,7 +281,7 @@ public class Board {
 	 */
 	public Piece getPiece(int x, int y) {
 		for (Piece piece : pieces) {
-			if (x == piece.x && y == piece.y) {
+			if (x == piece.getX() && y == piece.getY()) {
 				return piece;
 			}
 		}
@@ -287,13 +337,14 @@ public class Board {
 				Piece p = getPiece(y, x);
 				if (p == null) {
 					int start = x;
-					x++;
+
 					while (p == null && x < boardWidth) {
-						p = getPiece(y, x);
 						x++;
+						p = getPiece(y, x);
 					}
 					fen.append(x - start);
-				} else {
+				}
+				if (p != null) {
 					fen.append(p.getChar());
 				}
 			}
@@ -303,37 +354,39 @@ public class Board {
 		}
 
 		fen.append(" ");
-		if (Log.getLogArray().size() % 2 == 1) {
-			fen.append("w");
-		} else {
+		if (movelog.getLogArray().size() % 2 == 1) {
 			fen.append("b");
+		} else {
+			fen.append("w");
 		}
 		fen.append(" ");
 
-		// TODO calculate castling availability
-		fen.append("KQkq");
+		fen.append(castlingAvailability());
 
 		fen.append(" ");
 
-		// TODO en passant target square
-		fen.append("-");
+		if (enPassantTarget.isEmpty()) {
+			fen.append("-");
+		} else {
+			fen.append(enPassantTarget);
+		}
 
 		fen.append(" ");
 
 		// Halfmove clock: This is the number of halfmoves since the last
 		// capture or pawn advance. This is used to determine if a draw can
 		// be claimed under the fifty-move rule.
-		fen.append("0");
+		fen.append(movelog.getHalfMoveCount());
 		fen.append(" ");
 
 		// Fullmove number: The number of the full move. It starts at 1, and
 		// is incremented after Black's move.
-		fen.append("1");
+		fen.append(movelog.getFullMoveCount());
 		return fen.toString();
 	}
-	
-	public String getLogRaw(){
-		ArrayList<Integer[]> arr = Log.getLogArray();
+
+	public String getLogRaw() {
+		ArrayList<Integer[]> arr = movelog.getLogArray();
 		StringBuilder sb = new StringBuilder();
 		for (Integer[] integers : arr) {
 			sb.append(integers[0] + ",");
@@ -342,6 +395,36 @@ public class Board {
 			sb.append(integers[3] + "\n");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Returns if the pieces have moved yet
+	 * 
+	 * @return a string which FEN can use to determine availability of castling
+	 */
+	public String castlingAvailability() {
+		StringBuilder castling = new StringBuilder();
+		if (!whiteKing.hasMoved()) {
+			if (!whiteKingSide.hasMoved()) {
+				castling.append("K");
+			}
+			if (!whiteQueenSide.hasMoved()) {
+				castling.append("Q");
+			}
+		}
+		if (!blackKing.hasMoved()) {
+			if (!blackKingSide.hasMoved()) {
+				castling.append("k");
+			}
+			if (!blackQueenSide.hasMoved()) {
+				castling.append("q");
+			}
+		}
+		if (castling.toString().isEmpty()) {
+			return "-";
+		} else {
+			return castling.toString();
+		}
 	}
 
 }

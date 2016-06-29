@@ -9,7 +9,7 @@ import java.util.HashMap;
 import javax.swing.JPanel;
 
 import chessModel.Board;
-import chessModel.Piece;
+import chessModel.piece.Piece;
 
 public class ChessView extends JPanel {
 

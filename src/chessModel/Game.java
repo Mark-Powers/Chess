@@ -3,7 +3,10 @@ package chessModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
+
+import chessModel.piece.Piece;
 
 public class Game {
 	private int currentSide;
@@ -12,10 +15,19 @@ public class Game {
 	private Timer side2Timer;
 	private Time player1TimeLeft;
 	private Time player2TimeLeft;
+	Player player1, player2;
+	private boolean humanInputEnabled;
 
 	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
 
 	public Game() {
+		humanInputEnabled = false;
+				
+		player1 = new HumanPlayer("Human Player One", 0);
+		
+		player2 = new HumanPlayer("Human Player Two", 1);
+		//player2 = new DummyPlayer(board, 1);
+		
 		board = new Board();
 		currentSide = 0;
 		player1TimeLeft = new Time(DEFAULT_TIME);
@@ -32,10 +44,38 @@ public class Game {
 			}
 		});
 		side1Timer.start();
+		
+		gameLoop();
+	}
+	
+	public void gameLoop(){
+		while (!isCheckMate()){
+			humanInputEnabled = false;
+			if (getCurrentPlayer() instanceof HumanPlayer){
+				humanInputEnabled = true;
+				return;
+			} else {
+				Integer[] move = ((ComputerPlayer)getCurrentPlayer()).getMove();
+				move(move[0],move[1],move[2],move[3]);
+			}
+		}
+		JOptionPane.showMessageDialog(null, "Checkmate");
+	}
+	
+	public Player getCurrentPlayer(){
+		if (currentSide == 0){
+			return player1;
+		} else {
+			return player2;
+		}
 	}
 
 	public void move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
+		if (tmp == null){
+			JOptionPane.showMessageDialog(null, "AI submitted invalid move.", "INVALID", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
+		}
 		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
 			if (currentSide == 0) {
 				currentSide = 1;
@@ -94,5 +134,9 @@ public class Game {
 	 */
 	public boolean isDraw(){
 		return (board.getAllMoves(currentSide).size()==0);
+	}
+
+	public boolean isHumanInputEnabled() {
+		return humanInputEnabled;
 	}
 }

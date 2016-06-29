@@ -1,4 +1,6 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
 
 public class Bishop extends Piece
 {

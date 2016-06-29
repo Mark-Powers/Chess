@@ -3,6 +3,7 @@ package chessViewController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -29,7 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
-import chessModel.Piece;
+import chessModel.piece.Piece;
 
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
@@ -47,6 +49,7 @@ public class GraphicsGUI extends JFrame {
 	}
 
 	public GraphicsGUI() {
+		
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
 
@@ -145,46 +148,43 @@ public class GraphicsGUI extends JFrame {
 				JPanel p = new JPanel();
 				p.setLayout(new BorderLayout());
 				
-				JTextArea pgn = new JTextArea("PGN:\n"+b.getPGN());
+				JTextArea pgn = new JTextArea("PGN:\n"+b.getPGN(),8,35);
 				pgn.setEditable(false);
 				
-				JTextArea fen = new JTextArea("Fen:\n"+b.getFEN());
-				fen.setEditable(false);
-				fen.setBackground(Color.lightGray);
+				JScrollPane pgnScrollPane = new JScrollPane(pgn);
+				pgnScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 				
-				JTextArea raw = new JTextArea("Raw Moves:\n"+b.getLogRaw());
+				JTextArea fen = new JTextArea("\nFen:\n"+b.getFEN()+"\n");
+				fen.setEditable(false);
+				fen.setForeground(new Color(22,22,200));
+				
+				JTextArea raw = new JTextArea(4, 35);
+				raw.setText("Raw Moves:\n"+b.getLogRaw());
 				raw.setEditable(false);
 				
-				p.add(pgn, BorderLayout.NORTH);
+				JScrollPane rawScrollPane = new JScrollPane(raw);
+				rawScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+								
+				p.add(pgnScrollPane, BorderLayout.NORTH);
 				p.add(fen, BorderLayout.CENTER);
-				p.add(raw, BorderLayout.SOUTH);
+				p.add(rawScrollPane, BorderLayout.SOUTH);
 				
 				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 
-		chessView.addMouseListener(new MouseAdapter() {
+		MouseAdapter humanInput = new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				int cellSize = chessView.getCellSize();
 				int xLoc = (e.getY()) / cellSize;
 				int yLoc = (e.getX()) / cellSize;
-				if (chessView.getSelected() != null) {
-					g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
-					chessView.setSelected(null);
-					chessView.repaint();
-				} else {
-					Piece p = g.getBoard().getPiece(xLoc, yLoc);
-					if (p == null) {
-						chessView.setSelected(null);
-					} else if (p.equals(chessView.getSelected())) {
-						chessView.setSelected(null);
-					} else {
-						chessView.setSelected(p);
-					}
-					chessView.repaint();
+				if (g.isHumanInputEnabled()){
+					handleLocationClicked(xLoc, yLoc);
 				}
 			}
-		});
+		};
+		
+		chessView.addMouseListener(humanInput);
 	}
 	
 	public void isOver(){
@@ -194,6 +194,29 @@ public class GraphicsGUI extends JFrame {
 			JOptionPane.showMessageDialog(this, "It's a draw!");
 		} else if(g.getPlayer1Time().equals("0:0") || g.getPlayer2Time().equals("0:0")){
 			JOptionPane.showMessageDialog(this, "Time's Up!");
+		}
+	}
+
+	/**
+	 * @param xLoc
+	 * @param yLoc
+	 */
+	private void handleLocationClicked(int xLoc, int yLoc) {
+		if (chessView.getSelected() != null) {
+			g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
+			chessView.setSelected(null);
+			chessView.repaint();
+			g.gameLoop();
+		} else {
+			Piece p = g.getBoard().getPiece(xLoc, yLoc);
+			if (p == null) {
+				chessView.setSelected(null);
+			} else if (p.equals(chessView.getSelected())) {
+				chessView.setSelected(null);
+			} else {
+				chessView.setSelected(p);
+			}
+			chessView.repaint();
 		}
 	}
 }

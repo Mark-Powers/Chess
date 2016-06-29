@@ -1,13 +1,24 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
+
 public class Rook extends Piece
 {
-	boolean canCastle;
+	public static int KINGSIDE = 0;
+	public static int QUEENSIDE = 1;
+	int corner;
+	boolean hasMoved;
     public Rook(int x, int y, int side)
     {
         this.x = x;
         this.y = y;
+        if (y == 0){
+        	corner = KINGSIDE;
+        } else {
+        	corner = QUEENSIDE;
+        }
         this.side = side;
-        canCastle = true;
+        hasMoved = false;
     }
     public String getChar(){
         if(side==0)
@@ -18,7 +29,7 @@ public class Rook extends Piece
     	if(validMove(x, y, status)){
     		this.x = x;
     		this.y = y;
-    		canCastle = false;
+    		hasMoved = true;
     		return true;
     	}
     	return false;
@@ -28,5 +39,11 @@ public class Rook extends Piece
     }
     public int getValue(){
     	return 5;
+    }
+    public int getCorner(){
+    	return corner;
+    }
+    public boolean hasMoved(){
+    	return hasMoved;
     }
 }
