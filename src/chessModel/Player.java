@@ -10,4 +10,8 @@ public abstract class Player {
 		side = s;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 }

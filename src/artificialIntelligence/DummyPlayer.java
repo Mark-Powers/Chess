@@ -1,7 +1,9 @@
-package chessModel;
+package artificialIntelligence;
+
+import chessModel.*;
 
 public class DummyPlayer extends ComputerPlayer {
-
+	
 	public DummyPlayer(Board b, int s) {
 		super(b, "Dummy Player " + (s + 1), s);
 	}

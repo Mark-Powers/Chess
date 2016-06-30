@@ -61,6 +61,8 @@ public class GraphicsGUI extends JFrame {
 		} catch (Exception e) {
 			System.out.println("Could not find native look and feel.");
 		}
+		
+		centerWindow();
 
 		this.setLayout(new BorderLayout());
 
@@ -112,11 +114,7 @@ public class GraphicsGUI extends JFrame {
 
 		pack();
 
-		this.setSize(424, 500);
-
-		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
-				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
+		centerWindow();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		save.addActionListener(new ActionListener() {
@@ -185,6 +183,17 @@ public class GraphicsGUI extends JFrame {
 		};
 		
 		chessView.addMouseListener(humanInput);
+	}
+
+	/**
+	 * 
+	 */
+	private void centerWindow() {
+		this.setSize(424, 500);
+
+		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
+				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 	}
 	
 	public void isOver(){

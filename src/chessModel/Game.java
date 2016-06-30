@@ -2,11 +2,16 @@ package chessModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import chessModel.piece.Piece;
+import util.Instantiator;
 
 public class Game {
 	private int currentSide;
@@ -22,13 +27,30 @@ public class Game {
 
 	public Game() {
 		humanInputEnabled = false;
-				
-		player1 = new HumanPlayer("Human Player One", 0);
-		
-		player2 = new HumanPlayer("Human Player Two", 1);
-		//player2 = new DummyPlayer(board, 1);
-		
+
 		board = new Board();
+
+		player1 = new HumanPlayer("Human Player One", 0);
+
+		try {
+			File[] files = Instantiator.getPackageContent("artificialIntelligence");
+			ArrayList<String> names = new ArrayList<String>();
+			for (File f : files){
+				names.add(f.getName().substring(0,f.getName().indexOf(".")));
+			}
+			JComboBox<Object> options = new JComboBox<Object>(names.toArray());
+			JOptionPane.showMessageDialog(null, options);
+			File f = files[options.getSelectedIndex()];
+			String className = "artificialIntelligence" + "." + f.getName().substring(0,f.getName().indexOf("."));
+			player2 = Instantiator.makeComputerPlayer(f.getPath(), className, board, 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (player2 == null) {
+		player2 = new HumanPlayer("Human Player Two", 1);
+		}
+
 		currentSide = 0;
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);
@@ -44,26 +66,26 @@ public class Game {
 			}
 		});
 		side1Timer.start();
-		
+
 		gameLoop();
 	}
-	
-	public void gameLoop(){
-		while (!isCheckMate()){
+
+	public void gameLoop() {
+		while (!isCheckMate()) {
 			humanInputEnabled = false;
-			if (getCurrentPlayer() instanceof HumanPlayer){
+			if (getCurrentPlayer() instanceof HumanPlayer) {
 				humanInputEnabled = true;
 				return;
 			} else {
-				Integer[] move = ((ComputerPlayer)getCurrentPlayer()).getMove();
-				move(move[0],move[1],move[2],move[3]);
+				Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove();
+				move(move[0], move[1], move[2], move[3]);
 			}
 		}
 		JOptionPane.showMessageDialog(null, "Checkmate");
 	}
-	
-	public Player getCurrentPlayer(){
-		if (currentSide == 0){
+
+	public Player getCurrentPlayer() {
+		if (currentSide == 0) {
 			return player1;
 		} else {
 			return player2;
@@ -72,7 +94,7 @@ public class Game {
 
 	public void move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
-		if (tmp == null){
+		if (tmp == null) {
 			JOptionPane.showMessageDialog(null, "AI submitted invalid move.", "INVALID", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
@@ -104,36 +126,42 @@ public class Game {
 	public int getCurrentSide() {
 		return currentSide;
 	}
-	public int getPlayer1Score(){
+
+	public int getPlayer1Score() {
 		return board.getWhiteScore();
 	}
-	public int getPlayer2Score(){
+
+	public int getPlayer2Score() {
 		return board.getBlackScore();
 	}
-		
+
 	/**
-	 * @param side The side that is being checked for checkmate
+	 * @param side
+	 *            The side that is being checked for checkmate
 	 * @return
 	 */
-	public boolean isCheckMate(){
-		if(!board.isInCheck(currentSide)){ // Can't be in checkmate if not in check
+	public boolean isCheckMate() {
+		if (!board.isInCheck(currentSide)) { // Can't be in checkmate if not in
+												// check
 			return false;
 		}
-		for(Integer[] move : board.getAllMoves(0)){
+		for (Integer[] move : board.getAllMoves(0)) {
 			Piece p = board.getPiece(move[0], move[1]);
-			if(board.resolvesCheck(p, move[2], move[3])){
-				return false; // If there is a move that resolves check, it is not checkmate
+			if (board.resolvesCheck(p, move[2], move[3])) {
+				return false; // If there is a move that resolves check, it is
+								// not checkmate
 			}
 		}
 		return true;
 	}
-	
+
 	/**
-	 * @param side The side that is being checked for a draw
+	 * @param side
+	 *            The side that is being checked for a draw
 	 * @return
 	 */
-	public boolean isDraw(){
-		return (board.getAllMoves(currentSide).size()==0);
+	public boolean isDraw() {
+		return (board.getAllMoves(currentSide).size() == 0);
 	}
 
 	public boolean isHumanInputEnabled() {
