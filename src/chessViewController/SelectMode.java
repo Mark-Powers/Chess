@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
-import chessModel.Board;
 import chessModel.ComputerPlayer;
 import util.Instantiator;
 
@@ -17,12 +16,12 @@ public class SelectMode {
 		modes.add("Human vs. AI");
 		modes.add("Human vs. Human");
 		modes.add("AI vs. AI");
-		JComboBox selectMode = new JComboBox(modes.toArray());
+		JComboBox<?> selectMode = new JComboBox<Object>(modes.toArray());
 		JOptionPane.showMessageDialog(null, selectMode, "Select Game Mode", JOptionPane.PLAIN_MESSAGE);
 		return selectMode.getSelectedIndex();
 	}
 
-	public static ComputerPlayer pickComputerPlayer(Board board, int side) throws IOException {
+	public static ComputerPlayer pickComputerPlayer(int side) throws IOException {
 		File[] files = Instantiator.getPackageContent("artificialIntelligence");
 		ArrayList<String> names = new ArrayList<String>();
 		for (File f : files) {
@@ -32,6 +31,6 @@ public class SelectMode {
 		JOptionPane.showMessageDialog(null, options, "Select Player #" + (side+1), JOptionPane.PLAIN_MESSAGE);
 		File f = files[options.getSelectedIndex()];
 		String className = "artificialIntelligence" + "." + f.getName().substring(0, f.getName().indexOf("."));
-		return Instantiator.makeComputerPlayer(f.getPath(), className, board, 1);
+		return Instantiator.makeComputerPlayer(f.getPath(), className, 1);
 	}
 }

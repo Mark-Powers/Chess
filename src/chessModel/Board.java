@@ -100,7 +100,6 @@ public class Board {
 
 				if (selectedP instanceof Pawn) {
 					movelog.resetHalfMoveClock();
-					Pawn pawn = (Pawn) selectedP;
 					if (Math.abs(oldX - x) == 2) {
 						enPassantTarget = ChessUtil.convertChar(y)
 								+ String.valueOf(ChessUtil.convertRow((oldX + x) / 2));

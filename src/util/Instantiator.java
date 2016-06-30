@@ -8,16 +8,16 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import chessModel.Board;
 import chessModel.ComputerPlayer;
 
 public class Instantiator {
-	public static Class classToObject(String location, String name) throws ClassNotFoundException {
+	private static URLClassLoader loader;
+
+	public static Class<?> classToObject(String location, String name) throws ClassNotFoundException {
 		try {
-			URLClassLoader loader = new URLClassLoader(new URL[] { new URL("file://" + location + "/") });
+			loader = new URLClassLoader(new URL[] { new URL("file://" + location + "/") });
 			return loader.loadClass(name);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -29,20 +29,17 @@ public class Instantiator {
 		return null;
 	}
 
-	public static ComputerPlayer makeComputerPlayer(String location, String name, Board b, int side) {
+	public static ComputerPlayer makeComputerPlayer(String location, String name, int side) {
 
-		Class AI = null;
+		Class<?> AI = null;
 		try {
 			AI = Instantiator.classToObject(location, name);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		ComputerPlayer computerPlayer;
-		Class[] cArg = new Class[2];
-		cArg[0] = Board.class;
-		cArg[1] = int.class;
+
 		try {
-			return (ComputerPlayer) AI.getDeclaredConstructor(cArg).newInstance(b, side);
+			return (ComputerPlayer) AI.getDeclaredConstructor(int.class).newInstance(side);
 		} catch (Exception e){
 			e.printStackTrace();
 		}

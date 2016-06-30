@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import chessModel.Board;
 import chessModel.ComputerPlayer;
 import util.Instantiator;
 
@@ -25,7 +24,7 @@ public class TestLoadAI {
 			}
 			File f = files[0];
 			String className = "artificialIntelligence" + "." + f.getName().substring(0,f.getName().indexOf("."));
-			ComputerPlayer cp = Instantiator.makeComputerPlayer(f.getPath(), className, new Board(), 0);
+			ComputerPlayer cp = Instantiator.makeComputerPlayer(f.getPath(), className, 0);
 			assertTrue(cp instanceof ComputerPlayer);
 		} catch (IOException e) {
 			e.printStackTrace();

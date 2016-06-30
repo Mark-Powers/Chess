@@ -15,9 +15,9 @@ public class DisplayOnFail extends TestWatcher {
 	@Override
 	protected void failed(Throwable e, Description description) {
 		if (type == REALBOARD) {
-			TestBoardTests.display(TestBoardTests.getBoard());
+			TestBoardTests.display(RealBoardTests.getBoard());
 		} else {
-			RealBoardTests.display(RealBoardTests.getBoard());
+			RealBoardTests.display(TestBoardTests.getBoard());
 		}
 	}
 }

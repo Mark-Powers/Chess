@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
@@ -30,6 +31,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
+import chessModel.HumanPlayer;
+import chessModel.Player;
 import chessModel.piece.Piece;
 
 public class GraphicsGUI extends JFrame {
@@ -42,12 +45,8 @@ public class GraphicsGUI extends JFrame {
 	JLabel timer2Label;
 	JLabel player1Score;
 	JLabel player2Score;
-	
-	public static void main(String args[]) {
-		new GraphicsGUI();
-	}
 
-	public GraphicsGUI() {
+	public GraphicsGUI(int gameMode, Player player1, Player player2) {
 		
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
@@ -74,8 +73,9 @@ public class GraphicsGUI extends JFrame {
 		file.add(details);
 
 		this.setJMenuBar(menu);
+						
+		g = new Game(gameMode, player1, player2);
 		
-		g = new Game();
 		final Board b = g.getBoard();
 
 		chessView = new ChessView(b);
@@ -133,7 +133,7 @@ public class GraphicsGUI extends JFrame {
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
-					JOptionPane.showMessageDialog(null, "Unable to write file");
+					popup("Unable to write file");
 				}
 			}
 		});
@@ -239,6 +239,9 @@ public class GraphicsGUI extends JFrame {
 			}
 			chessView.repaint();
 		}
+	}
+	public static void popup(String message){
+		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
 	}
 }
 

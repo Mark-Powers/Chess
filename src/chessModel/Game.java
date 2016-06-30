@@ -2,13 +2,11 @@ package chessModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import chessModel.piece.Piece;
-import chessViewController.SelectMode;
 
 public class Game {
 	private int currentSide;
@@ -28,34 +26,19 @@ public class Game {
 	public static int HUMAN_VS_HUMAN = 1;
 	public static int AI_VS_AI = 2;
 
-	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
+	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one hour
 
-	public Game() {
+	public Game(int gameMode, Player player1, Player player2) {
 		humanInputEnabled = false;
 
 		board = new Board();
 
-		gameMode = SelectMode.selectMode();
+		this.gameMode = gameMode;
 		
 		needsRedraw = false;
-
-		try {
-			if (gameMode != 2) {
-				player1 = new HumanPlayer("Human Player One", 0);
-			} else {
-				player1 = SelectMode.pickComputerPlayer(board, 0);
-			}
-
-			if (gameMode != 1) {
-				player2 = SelectMode.pickComputerPlayer(board, 1);
-			} else {
-				player2 = new HumanPlayer("Human Player Two", 1);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Failed to load players");
-			System.exit(0);
-		}
+		
+		this.player1 = player1;
+		this.player2 = player2;
 
 		currentSide = 0;
 		player1TimeLeft = new Time(DEFAULT_TIME);
@@ -98,7 +81,7 @@ public class Game {
 				computeMove = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove();
+						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove(board);
 						move(move[0], move[1], move[2], move[3]);
 						needsRedraw = true;
 					}
@@ -107,7 +90,7 @@ public class Game {
 				return;
 			}
 		}
-		JOptionPane.showMessageDialog(null, "Checkmate");
+		popup("Checkmate");
 	}
 
 	public Player getCurrentPlayer() {
@@ -121,7 +104,7 @@ public class Game {
 	public void move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
 		if (tmp == null) {
-			JOptionPane.showMessageDialog(null, "AI submitted invalid move.", "INVALID", JOptionPane.ERROR_MESSAGE);
+			popup("AI submitted invalid move.");
 			System.exit(0);
 		}
 		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
@@ -205,4 +188,9 @@ public class Game {
 	public void markDrawn(){
 		needsRedraw = false;
 	}
+	
+	public void popup(String message){
+		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
+	}
+
 }

@@ -8,12 +8,12 @@ import chessModel.*;
  */
 public class UnimplementedPlayer extends ComputerPlayer {
 	
-	public UnimplementedPlayer(Board b, int s) {
-		super(b, "Dummy Player " + (s + 1), s);
+	public UnimplementedPlayer(int s) {
+		super("Dummy Player " + (s + 1), s);
 	}
 
 	@Override
-	public Integer[] getMove() {
+	public Integer[] getMove(Board board) {
 		Integer[] move = { 1, 1, 3, 1 };
 		return move;
 	}
