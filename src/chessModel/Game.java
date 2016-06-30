@@ -2,21 +2,18 @@ package chessModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import chessModel.piece.Piece;
 import chessViewController.SelectMode;
-import util.Instantiator;
 
 public class Game {
 	private int currentSide;
 	private int gameMode;
+	private boolean needsRedraw;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
@@ -24,6 +21,7 @@ public class Game {
 	private Time player2TimeLeft;
 	Player player1, player2;
 	private boolean humanInputEnabled;
+	private Thread computeMove;
 
 	// Game Modes
 	public static int HUMAN_VS_AI = 0;
@@ -38,6 +36,8 @@ public class Game {
 		board = new Board();
 
 		gameMode = SelectMode.selectMode();
+		
+		needsRedraw = false;
 
 		try {
 			if (gameMode != 2) {
@@ -73,6 +73,17 @@ public class Game {
 		});
 		side1Timer.start();
 
+		Timer checkOnCompterPlayer = new Timer(100, new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (humanInputEnabled == false && !computeMove.isAlive()){
+					gameLoop();
+				}
+			}
+		});
+		checkOnCompterPlayer.start();
+		
 		gameLoop();
 	}
 
@@ -83,8 +94,17 @@ public class Game {
 				humanInputEnabled = true;
 				return;
 			} else {
-				Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove();
-				move(move[0], move[1], move[2], move[3]);
+				
+				computeMove = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove();
+						move(move[0], move[1], move[2], move[3]);
+						needsRedraw = true;
+					}
+				});
+				computeMove.start();
+				return;
 			}
 		}
 		JOptionPane.showMessageDialog(null, "Checkmate");
@@ -172,5 +192,17 @@ public class Game {
 
 	public boolean isHumanInputEnabled() {
 		return humanInputEnabled;
+	}
+	
+	public int getGameMode(){
+		return gameMode;
+	}
+	
+	public boolean needsRedraw(){
+		return needsRedraw;
+	}
+	
+	public void markDrawn(){
+		needsRedraw = false;
 	}
 }

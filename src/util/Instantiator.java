@@ -18,8 +18,6 @@ public class Instantiator {
 	public static Class classToObject(String location, String name) throws ClassNotFoundException {
 		try {
 			URLClassLoader loader = new URLClassLoader(new URL[] { new URL("file://" + location + "/") });
-			System.out.println(loader.getURLs()[0]);
-
 			return loader.loadClass(name);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

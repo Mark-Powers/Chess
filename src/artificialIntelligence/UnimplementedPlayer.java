@@ -2,9 +2,13 @@ package artificialIntelligence;
 
 import chessModel.*;
 
-public class DummyPlayer extends ComputerPlayer {
+/**
+ * 
+ * @author Roger
+ */
+public class UnimplementedPlayer extends ComputerPlayer {
 	
-	public DummyPlayer(Board b, int s) {
+	public UnimplementedPlayer(Board b, int s) {
 		super(b, "Dummy Player " + (s + 1), s);
 	}
 

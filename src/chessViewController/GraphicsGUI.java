@@ -3,7 +3,6 @@ package chessViewController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -183,6 +182,19 @@ public class GraphicsGUI extends JFrame {
 		};
 		
 		chessView.addMouseListener(humanInput);
+		
+		if (g.getGameMode() != Game.HUMAN_VS_HUMAN){
+			Timer refreshGame = new Timer(500,new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (g.needsRedraw()){
+						chessView.repaint();
+					}
+				}
+			});
+			refreshGame.start();
+		}
 	}
 
 	/**
