@@ -184,7 +184,7 @@ public class GraphicsGUI extends JFrame {
 		chessView.addMouseListener(humanInput);
 		
 		if (g.getGameMode() != Game.HUMAN_VS_HUMAN){
-			Timer refreshGame = new Timer(500,new ActionListener() {
+			Timer redrawTimer = new Timer(10,new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -193,7 +193,7 @@ public class GraphicsGUI extends JFrame {
 					}
 				}
 			});
-			refreshGame.start();
+			redrawTimer.start();
 		}
 	}
 
