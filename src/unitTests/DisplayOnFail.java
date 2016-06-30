@@ -4,8 +4,20 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 public class DisplayOnFail extends TestWatcher {
-    @Override
-    protected void failed(Throwable e, Description description) {
-    	BoardTests.display(BoardTests.getBoard());
-    }
+	public static int REALBOARD = 0;
+	public static int TESTBOARD = 1;
+	private int type;
+
+	public DisplayOnFail(int type) {
+		this.type = type;
+	}
+
+	@Override
+	protected void failed(Throwable e, Description description) {
+		if (type == REALBOARD) {
+			TestBoardTests.display(TestBoardTests.getBoard());
+		} else {
+			RealBoardTests.display(RealBoardTests.getBoard());
+		}
+	}
 }

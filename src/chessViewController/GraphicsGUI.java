@@ -3,7 +3,6 @@ package chessViewController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -61,6 +60,8 @@ public class GraphicsGUI extends JFrame {
 		} catch (Exception e) {
 			System.out.println("Could not find native look and feel.");
 		}
+		
+		centerWindow();
 
 		this.setLayout(new BorderLayout());
 
@@ -112,11 +113,7 @@ public class GraphicsGUI extends JFrame {
 
 		pack();
 
-		this.setSize(424, 500);
-
-		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
-				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
+		centerWindow();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		save.addActionListener(new ActionListener() {
@@ -185,6 +182,30 @@ public class GraphicsGUI extends JFrame {
 		};
 		
 		chessView.addMouseListener(humanInput);
+		
+		if (g.getGameMode() != Game.HUMAN_VS_HUMAN){
+			Timer redrawTimer = new Timer(10,new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (g.needsRedraw()){
+						chessView.repaint();
+					}
+				}
+			});
+			redrawTimer.start();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void centerWindow() {
+		this.setSize(424, 500);
+
+		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
+				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 	}
 	
 	public void isOver(){

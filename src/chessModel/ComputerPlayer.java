@@ -1,7 +1,7 @@
 package chessModel;
 
 public abstract class ComputerPlayer extends Player{
-	Board board;
+	private Board board;
 
 	public ComputerPlayer(Board b, String n, int s){
 		super(n, s);
@@ -16,4 +16,12 @@ public abstract class ComputerPlayer extends Player{
 	 *         toY)
 	 */
 	public abstract Integer[] getMove();
+	
+	/**
+	 * Allow access to board
+	 * @return
+	 */
+	public Board getBoard(){
+		return board;
+	}
 }

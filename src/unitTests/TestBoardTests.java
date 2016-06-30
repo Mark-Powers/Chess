@@ -25,14 +25,14 @@ import chessModel.piece.Piece;
 import chessModel.piece.Rook;
 import chessViewController.ChessView;
 
-public class BoardTests {
+public class TestBoardTests {
 
 	// create a test board
 	private static TestBoard b = new TestBoard();
 
 	// brings up board on failure
 	@Rule
-	public DisplayOnFail failRule = new DisplayOnFail();
+	public DisplayOnFail failRule = new DisplayOnFail(DisplayOnFail.TESTBOARD);
 
 	@BeforeClass
 	public static void setup() {
@@ -215,55 +215,6 @@ public class BoardTests {
 		b.addPiece(new Pawn(5, 4, 1));
 		b.move(6, 5, 5, 4);
 		assertEquals(b.getPiece(5, 4), pawn);
-	}
-
-	@Test
-	public void testFENStartPosition() {
-		// create a standard board
-		Board board = new Board();
-
-		assertFalse("Board is upside down", board.getFEN().startsWith("RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr"));
-		assertTrue(board.getFEN().startsWith("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
-		assertEquals("Something at the end is wrong.", board.getFEN(),
-				"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	}
-
-	@Test
-	public void testFENWithMovesFull() {
-		// create a standard board
-		Board board = new Board();
-		
-		assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.getFEN());
-		board.move(6,4,4,4);
-		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.getFEN());
-		board.move(1,2,3,2);
-		assertEquals("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board.getFEN());
-		board.move(7,6,5,5);
-		assertEquals("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2", board.getFEN());
-	}
-	
-	@Test
-	public void testEnPassant(){
-		Board board = new Board();
-		board.move(1,6,2,6);
-		board.move(4,1,3,1);
-		board.move(1,0,3,0);
-		board.move(3,1,2,0);
-		assertTrue(board.getPiece(2, 0)==null);
-	}
-
-	@Test
-	public void testFENClocks() {
-		// create a standard board
-		Board board = new Board();
-
-		assertTrue(board.getFEN().endsWith("0 1"));
-		board.move(6, 4, 4, 4);
-		assertTrue(board.getFEN().endsWith("0 1"));
-		board.move(1, 1, 3, 1);
-		assertTrue(board.getFEN().endsWith("0 2"));
-		board.move(7, 6, 5, 5);
-		assertTrue(board.getFEN().endsWith("1 2"));
 	}
 
 	public static void display(Board displayboard) {
