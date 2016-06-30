@@ -7,4 +7,4 @@ A chess program, that allows for the writing of custom AI.
 4. (Optional) If you want unit tests to work you will have to at JUnit 4 to your build path
 
 ## Copying
-See Readme
+See LICENSE
