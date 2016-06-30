@@ -11,10 +11,12 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import chessModel.piece.Piece;
+import chessViewController.SelectMode;
 import util.Instantiator;
 
 public class Game {
 	private int currentSide;
+	private int gameMode;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
@@ -23,6 +25,11 @@ public class Game {
 	Player player1, player2;
 	private boolean humanInputEnabled;
 
+	// Game Modes
+	public static int HUMAN_VS_AI = 0;
+	public static int HUMAN_VS_HUMAN = 1;
+	public static int AI_VS_AI = 2;
+
 	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
 
 	public Game() {
@@ -30,25 +37,24 @@ public class Game {
 
 		board = new Board();
 
-		player1 = new HumanPlayer("Human Player One", 0);
+		gameMode = SelectMode.selectMode();
 
 		try {
-			File[] files = Instantiator.getPackageContent("artificialIntelligence");
-			ArrayList<String> names = new ArrayList<String>();
-			for (File f : files){
-				names.add(f.getName().substring(0,f.getName().indexOf(".")));
+			if (gameMode != 2) {
+				player1 = new HumanPlayer("Human Player One", 0);
+			} else {
+				player1 = SelectMode.pickComputerPlayer(board, 0);
 			}
-			JComboBox<Object> options = new JComboBox<Object>(names.toArray());
-			JOptionPane.showMessageDialog(null, options);
-			File f = files[options.getSelectedIndex()];
-			String className = "artificialIntelligence" + "." + f.getName().substring(0,f.getName().indexOf("."));
-			player2 = Instantiator.makeComputerPlayer(f.getPath(), className, board, 1);
+
+			if (gameMode != 1) {
+				player2 = SelectMode.pickComputerPlayer(board, 1);
+			} else {
+				player2 = new HumanPlayer("Human Player Two", 1);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
-		if (player2 == null) {
-		player2 = new HumanPlayer("Human Player Two", 1);
+			JOptionPane.showMessageDialog(null, "Failed to load players");
+			System.exit(0);
 		}
 
 		currentSide = 0;
