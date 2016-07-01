@@ -21,7 +21,6 @@ public class RandomMove extends ComputerPlayer {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		board.move(1, 1, 3, 1);
 				
 		return allMoves.get((int) (Math.random()*(allMoves.size()-1)));
 	}
