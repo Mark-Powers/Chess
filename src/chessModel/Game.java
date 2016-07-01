@@ -26,7 +26,10 @@ public class Game {
 	public static int HUMAN_VS_HUMAN = 1;
 	public static int AI_VS_AI = 2;
 
-	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one hour
+	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
+													// hour
+	
+	private int invalidMovesCount;
 
 	public Game(int gameMode, Player player1, Player player2) {
 		humanInputEnabled = false;
@@ -34,9 +37,11 @@ public class Game {
 		board = new Board();
 
 		this.gameMode = gameMode;
-		
+
 		needsRedraw = false;
 		
+		invalidMovesCount = 0;
+
 		this.player1 = player1;
 		this.player2 = player2;
 
@@ -57,16 +62,16 @@ public class Game {
 		side1Timer.start();
 
 		Timer checkOnCompterPlayer = new Timer(100, new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (humanInputEnabled == false && !computeMove.isAlive()){
+				if (humanInputEnabled == false && !computeMove.isAlive()) {
 					gameLoop();
 				}
 			}
 		});
 		checkOnCompterPlayer.start();
-		
+
 		gameLoop();
 	}
 
@@ -77,13 +82,30 @@ public class Game {
 				humanInputEnabled = true;
 				return;
 			} else {
-				
+
 				computeMove = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove(board);
-						move(move[0], move[1], move[2], move[3]);
-						needsRedraw = true;
+						if (invalidMovesCount > 9){
+							popup("Submitted invalid move ten times");
+							System.exit(0);
+						}
+						Board sandbox = new TestBoard();
+						((TestBoard) sandbox).populateFromFEN(board.getFEN());
+						Integer[] move = ((ComputerPlayer) getCurrentPlayer())
+								.getMove(sandbox);
+						Piece pieceToMove = board.getPiece(move[0], move[1]);
+						if (pieceToMove == null){
+							System.out.println(++invalidMovesCount);
+						} else if (pieceToMove.validMove(move[2], move[3], board
+								.getSquareStatus(pieceToMove.getX(),
+										pieceToMove.getY(),
+										pieceToMove.getSide()))) {
+							move(move[0], move[1], move[2], move[3]);
+							needsRedraw = true;
+						} else {
+							System.out.println("invalid move #" + ++invalidMovesCount);
+						}
 					}
 				});
 				computeMove.start();
@@ -176,21 +198,22 @@ public class Game {
 	public boolean isHumanInputEnabled() {
 		return humanInputEnabled;
 	}
-	
-	public int getGameMode(){
+
+	public int getGameMode() {
 		return gameMode;
 	}
-	
-	public boolean needsRedraw(){
+
+	public boolean needsRedraw() {
 		return needsRedraw;
 	}
-	
-	public void markDrawn(){
+
+	public void markDrawn() {
 		needsRedraw = false;
 	}
-	
-	public void popup(String message){
-		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
+
+	public void popup(String message) {
+		JOptionPane.showMessageDialog(null, message, "",
+				JOptionPane.PLAIN_MESSAGE);
 	}
 
 }
