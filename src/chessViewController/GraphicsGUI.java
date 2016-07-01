@@ -121,7 +121,7 @@ public class GraphicsGUI extends JFrame {
 			// @Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = new JFileChooser();
-				File f = new File("C:/CHESSLOGS");
+				File f = new File(System.getProperty("user.home"));
 				fc.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
 				f.mkdirs();
 				fc.setCurrentDirectory(f);
