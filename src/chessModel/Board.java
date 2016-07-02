@@ -320,6 +320,14 @@ public class Board {
 	public int getBlackScore() {
 		return blackScore;
 	}
+	
+	public int getScore(int s){
+		if (s==0){
+			return getWhiteScore();
+		} else {
+			return getBlackScore();
+		}
+	}
 
 	public String getPGN() {
 		return movelog.toString();
