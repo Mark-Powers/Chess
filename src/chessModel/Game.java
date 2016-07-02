@@ -102,6 +102,7 @@ public class Game {
 										pieceToMove.getY(),
 										pieceToMove.getSide()))) {
 							move(move[0], move[1], move[2], move[3]);
+							invalidMovesCount = 0;
 							needsRedraw = true;
 						} else {
 							System.out.println("invalid move #" + ++invalidMovesCount);
