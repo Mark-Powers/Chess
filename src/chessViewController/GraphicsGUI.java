@@ -3,7 +3,6 @@ package chessViewController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -12,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
@@ -31,6 +31,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
+import chessModel.HumanPlayer;
+import chessModel.Player;
 import chessModel.piece.Piece;
 
 public class GraphicsGUI extends JFrame {
@@ -43,12 +45,8 @@ public class GraphicsGUI extends JFrame {
 	JLabel timer2Label;
 	JLabel player1Score;
 	JLabel player2Score;
-	
-	public static void main(String args[]) {
-		new GraphicsGUI();
-	}
 
-	public GraphicsGUI() {
+	public GraphicsGUI(int gameMode, Player player1, Player player2) {
 		
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
@@ -61,6 +59,8 @@ public class GraphicsGUI extends JFrame {
 		} catch (Exception e) {
 			System.out.println("Could not find native look and feel.");
 		}
+		
+		centerWindow();
 
 		this.setLayout(new BorderLayout());
 
@@ -73,8 +73,9 @@ public class GraphicsGUI extends JFrame {
 		file.add(details);
 
 		this.setJMenuBar(menu);
+						
+		g = new Game(gameMode, player1, player2);
 		
-		g = new Game();
 		final Board b = g.getBoard();
 
 		chessView = new ChessView(b);
@@ -112,11 +113,7 @@ public class GraphicsGUI extends JFrame {
 
 		pack();
 
-		this.setSize(424, 500);
-
-		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
-				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
+		centerWindow();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		save.addActionListener(new ActionListener() {
@@ -124,7 +121,7 @@ public class GraphicsGUI extends JFrame {
 			// @Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = new JFileChooser();
-				File f = new File("C:/CHESSLOGS");
+				File f = new File(System.getProperty("user.home"));
 				fc.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
 				f.mkdirs();
 				fc.setCurrentDirectory(f);
@@ -136,7 +133,7 @@ public class GraphicsGUI extends JFrame {
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
-					JOptionPane.showMessageDialog(null, "Unable to write file");
+					popup("Unable to write file");
 				}
 			}
 		});
@@ -185,6 +182,30 @@ public class GraphicsGUI extends JFrame {
 		};
 		
 		chessView.addMouseListener(humanInput);
+		
+		if (g.getGameMode() != Game.HUMAN_VS_HUMAN){
+			Timer redrawTimer = new Timer(10,new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (g.needsRedraw()){
+						chessView.repaint();
+					}
+				}
+			});
+			redrawTimer.start();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void centerWindow() {
+		this.setSize(424, 500);
+
+		Dimension screenDimensions = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
+				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 	}
 	
 	public void isOver(){
@@ -218,6 +239,9 @@ public class GraphicsGUI extends JFrame {
 			}
 			chessView.repaint();
 		}
+	}
+	public static void popup(String message){
+		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
 	}
 }
 

@@ -2,8 +2,6 @@ package chessModel;
 
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import chessModel.piece.Bishop;
 import chessModel.piece.King;
 import chessModel.piece.Knight;
@@ -66,7 +64,7 @@ public class Board {
 		SquareStatus status = SquareStatus.EMPTY;
 		// Sets selectedP to the right piece
 		selectedP = getPiece(oldX, oldY);
-		
+
 		// create a row-file string for the place the piece is moving to
 		String selectedPLocationString = ChessUtil.convertChar(y) + "" + ChessUtil.convertRow(x);
 
@@ -80,16 +78,15 @@ public class Board {
 					status = SquareStatus.ENEMY;
 				}
 			}
-			
-			if (selectedPLocationString.equals(enPassantTarget)){
+
+			if (selectedPLocationString.equals(enPassantTarget)) {
 				status = SquareStatus.ENEMY;
-				if (selectedP.getSide() == 0){
+				if (selectedP.getSide() == 0) {
 					otherP = getPiece(x + 1, y);
 				} else {
 					otherP = getPiece(x - 1, y);
 				}
 			}
-			
 
 			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
@@ -100,12 +97,9 @@ public class Board {
 					}
 				}
 				selectedP.move(x, y, status);
-				
-				
-				
+
 				if (selectedP instanceof Pawn) {
 					movelog.resetHalfMoveClock();
-					Pawn pawn = (Pawn) selectedP;
 					if (Math.abs(oldX - x) == 2) {
 						enPassantTarget = ChessUtil.convertChar(y)
 								+ String.valueOf(ChessUtil.convertRow((oldX + x) / 2));
@@ -291,7 +285,10 @@ public class Board {
 	public ArrayList<Integer[]> getAllMoves(int side) {
 		ArrayList<Integer[]> moveList = new ArrayList<Integer[]>();
 		for (Piece p : pieces) {
-			moveList.add(getMovesForPiece(p));
+			Integer[] moves = getMovesForPiece(p);
+			if (moves[0] != null && moves[2] != null) {
+				moveList.add(moves);
+			}
 		}
 		return moveList;
 	}
@@ -322,6 +319,14 @@ public class Board {
 
 	public int getBlackScore() {
 		return blackScore;
+	}
+	
+	public int getScore(int s){
+		if (s==0){
+			return getWhiteScore();
+		} else {
+			return getBlackScore();
+		}
 	}
 
 	public String getPGN() {

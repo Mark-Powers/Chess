@@ -10,6 +10,8 @@ import chessModel.piece.Piece;
 
 public class Game {
 	private int currentSide;
+	private int gameMode;
+	private boolean needsRedraw;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
@@ -17,18 +19,32 @@ public class Game {
 	private Time player2TimeLeft;
 	Player player1, player2;
 	private boolean humanInputEnabled;
+	private Thread computeMove;
 
-	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
+	// Game Modes
+	public static int HUMAN_VS_AI = 0;
+	public static int HUMAN_VS_HUMAN = 1;
+	public static int AI_VS_AI = 2;
 
-	public Game() {
+	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
+													// hour
+	
+	private int invalidMovesCount;
+
+	public Game(int gameMode, Player player1, Player player2) {
 		humanInputEnabled = false;
-				
-		player1 = new HumanPlayer("Human Player One", 0);
-		
-		player2 = new HumanPlayer("Human Player Two", 1);
-		//player2 = new DummyPlayer(board, 1);
-		
+
 		board = new Board();
+
+		this.gameMode = gameMode;
+
+		needsRedraw = false;
+		
+		invalidMovesCount = 0;
+
+		this.player1 = player1;
+		this.player2 = player2;
+
 		currentSide = 0;
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);
@@ -44,26 +60,64 @@ public class Game {
 			}
 		});
 		side1Timer.start();
-		
+
+		Timer checkOnCompterPlayer = new Timer(100, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (humanInputEnabled == false && !computeMove.isAlive()) {
+					gameLoop();
+				}
+			}
+		});
+		checkOnCompterPlayer.start();
+
 		gameLoop();
 	}
-	
-	public void gameLoop(){
-		while (!isCheckMate()){
+
+	public void gameLoop() {
+		while (!isCheckMate()) {
 			humanInputEnabled = false;
-			if (getCurrentPlayer() instanceof HumanPlayer){
+			if (getCurrentPlayer() instanceof HumanPlayer) {
 				humanInputEnabled = true;
 				return;
 			} else {
-				Integer[] move = ((ComputerPlayer)getCurrentPlayer()).getMove();
-				move(move[0],move[1],move[2],move[3]);
+
+				computeMove = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						if (invalidMovesCount > 9){
+							popup("Submitted invalid move ten times");
+							System.exit(0);
+						}
+						Board sandbox = new TestBoard();
+						((TestBoard) sandbox).populateFromFEN(board.getFEN());
+						Integer[] move = ((ComputerPlayer) getCurrentPlayer())
+								.getMove(sandbox);
+						Piece pieceToMove = board.getPiece(move[0], move[1]);
+						if (pieceToMove == null){
+							System.out.println(++invalidMovesCount);
+						} else if (pieceToMove.validMove(move[2], move[3], board
+								.getSquareStatus(pieceToMove.getX(),
+										pieceToMove.getY(),
+										pieceToMove.getSide()))) {
+							move(move[0], move[1], move[2], move[3]);
+							invalidMovesCount = 0;
+							needsRedraw = true;
+						} else {
+							System.out.println("invalid move #" + ++invalidMovesCount);
+						}
+					}
+				});
+				computeMove.start();
+				return;
 			}
 		}
-		JOptionPane.showMessageDialog(null, "Checkmate");
+		popup("Checkmate");
 	}
-	
-	public Player getCurrentPlayer(){
-		if (currentSide == 0){
+
+	public Player getCurrentPlayer() {
+		if (currentSide == 0) {
 			return player1;
 		} else {
 			return player2;
@@ -72,8 +126,8 @@ public class Game {
 
 	public void move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
-		if (tmp == null){
-			JOptionPane.showMessageDialog(null, "AI submitted invalid move.", "INVALID", JOptionPane.ERROR_MESSAGE);
+		if (tmp == null) {
+			popup("AI submitted invalid move.");
 			System.exit(0);
 		}
 		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
@@ -104,39 +158,63 @@ public class Game {
 	public int getCurrentSide() {
 		return currentSide;
 	}
-	public int getPlayer1Score(){
+
+	public int getPlayer1Score() {
 		return board.getWhiteScore();
 	}
-	public int getPlayer2Score(){
+
+	public int getPlayer2Score() {
 		return board.getBlackScore();
 	}
-		
+
 	/**
-	 * @param side The side that is being checked for checkmate
+	 * @param side
+	 *            The side that is being checked for checkmate
 	 * @return
 	 */
-	public boolean isCheckMate(){
-		if(!board.isInCheck(currentSide)){ // Can't be in checkmate if not in check
+	public boolean isCheckMate() {
+		if (!board.isInCheck(currentSide)) { // Can't be in checkmate if not in
+												// check
 			return false;
 		}
-		for(Integer[] move : board.getAllMoves(0)){
+		for (Integer[] move : board.getAllMoves(0)) {
 			Piece p = board.getPiece(move[0], move[1]);
-			if(board.resolvesCheck(p, move[2], move[3])){
-				return false; // If there is a move that resolves check, it is not checkmate
+			if (board.resolvesCheck(p, move[2], move[3])) {
+				return false; // If there is a move that resolves check, it is
+								// not checkmate
 			}
 		}
 		return true;
 	}
-	
+
 	/**
-	 * @param side The side that is being checked for a draw
+	 * @param side
+	 *            The side that is being checked for a draw
 	 * @return
 	 */
-	public boolean isDraw(){
-		return (board.getAllMoves(currentSide).size()==0);
+	public boolean isDraw() {
+		return (board.getAllMoves(currentSide).size() == 0);
 	}
 
 	public boolean isHumanInputEnabled() {
 		return humanInputEnabled;
 	}
+
+	public int getGameMode() {
+		return gameMode;
+	}
+
+	public boolean needsRedraw() {
+		return needsRedraw;
+	}
+
+	public void markDrawn() {
+		needsRedraw = false;
+	}
+
+	public void popup(String message) {
+		JOptionPane.showMessageDialog(null, message, "",
+				JOptionPane.PLAIN_MESSAGE);
+	}
+
 }
