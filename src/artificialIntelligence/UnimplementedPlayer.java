@@ -1,6 +1,7 @@
 package artificialIntelligence;
 
-import chessModel.*;
+import chessModel.Board;
+import chessModel.ComputerPlayer;
 
 /**
  * 

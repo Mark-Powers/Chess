@@ -2,8 +2,6 @@ package chessModel;
 
 public abstract class ComputerPlayer extends Player{
 
-	
-	
 	/**
 	 * Ask the player for a move. The game should run this on a different thread.
 	 * @param board The board in play

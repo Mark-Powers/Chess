@@ -14,7 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import chessModel.Board;
+import chessModel.SquareStatus;
+import chessModel.piece.Bishop;
+import chessModel.piece.King;
+import chessModel.piece.Knight;
+import chessModel.piece.Pawn;
 import chessModel.piece.Piece;
+import chessModel.piece.Rook;
 import chessViewController.ChessView;
 
 public class RealBoardTests {
@@ -23,7 +29,7 @@ public class RealBoardTests {
 
 	// brings up board on failure
 	@Rule
-	public DisplayOnFail failRule = new DisplayOnFail(DisplayOnFail.REALBOARD);
+	public DisplayOnFail failRule = new DisplayOnFail();
 
 	@BeforeClass
 	public static void setup() {
@@ -78,23 +84,196 @@ public class RealBoardTests {
 		b.move(7, 6, 5, 5);
 		assertTrue(b.getFEN().endsWith("1 2"));
 	}
-	
+
 	@Test
-	public void testGetAllMoves(){
+	public void testGetAllMoves() {
 		ArrayList<Integer[]> allMoves = b.getAllMoves(0);
 		int i = 1;
-		for (Integer[] move : allMoves){
-			if (move == null){
+		for (Integer[] move : allMoves) {
+			if (move == null) {
 				fail("Move " + i + " the move was null.");
 			}
 			System.out.println(move[0] + "," + move[1]);
 			Piece p = b.getPiece(move[0], move[1]);
-			if (p == null){
+			if (p == null) {
 				fail("Move " + i + " in list failed because the piece was invalid.");
 			}
-			assertTrue("Move " + i + " in list failed.",p.validMove(move[2], move[3], b.getSquareStatus(move[2], move[3], 0)));
+			assertTrue("Move " + i + " in list failed.",
+					p.validMove(move[2], move[3], b.getSquareStatus(move[2], move[3], 0)));
 			i++;
 		}
+	}
+
+	@Test
+	public void testCheckRook() {
+		b = new Board(false);
+		b.addPiece(new Rook(1, 1, 0));
+		Piece king = new King(6, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Rook(1, 1, 0));
+		king = new King(1, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Rook(1, 6, 0));
+		king = new King(1, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Rook(6, 1, 0));
+		king = new King(1, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+	}
+
+	@Test
+	public void testCheckBishop() {
+		b = new Board(false);
+		b.addPiece(new Bishop(1, 1, 0));
+		Piece king = new King(6, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Bishop(5, 5, 0));
+		king = new King(1, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Bishop(6, 1, 0));
+		king = new King(1, 6, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Bishop(1, 6, 0));
+		king = new King(6, 1, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+	}
+
+	@Test
+	public void testCheckKnight() {
+		b = new Board(false);
+		b.addPiece(new Knight(6, 1, 0));
+		Piece king = new King(4, 2, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(2, 1, 0));
+		king = new King(4, 2, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(2, 3, 0));
+		king = new King(4, 2, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(2, 1, 0));
+		king = new King(4, 2, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(3, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(3, 6, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(5, 6, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(3, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+
+		b = new Board(false);
+		b.addPiece(new Knight(5, 2, 0));
+		king = new King(4, 4, 1);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 1));
+		assertTrue(b.isInCheck(1));
+	}
+
+	@Test
+	public void testOtherKing() {
+		b = new Board(false);
+		b.addPiece(new Knight(5, 2, 1));
+		Piece king = new King(4, 4, 0);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 0));
+		assertTrue(b.isInCheck(0));
+
+		b = new Board(false);
+		b.addPiece(new Knight(5, 2, 1));
+		king = new King(4, 4, 0);
+		b.addPiece(king);
+		assertTrue(b.isThreatenedSquare(king.getX(), king.getY(), 0));
+		assertTrue(b.isInCheck(0));
+	}
+
+	@Test
+	public void testBasicMove() {
+		b = new Board(false);
+		Piece pawn = new Pawn(6, 5, 0);
+		b.addPiece(pawn);
+		b.move(6, 5, 4, 5);
+		assertEquals(b.getPiece(4, 5), pawn);
+	}
+
+	@Test
+	public void testPawnMovement() {
+		b = new Board(false);
+		Piece pawn = new Pawn(6, 5, 0);
+		b.addPiece(pawn);
+		assertTrue(pawn.validMove(4, 5, SquareStatus.EMPTY));
+		assertTrue(pawn.validMove(5, 5, SquareStatus.EMPTY));
+
+		b = new Board(false);
+		pawn = new Pawn(6, 5, 0);
+		assertTrue(pawn.validMove(5, 4, SquareStatus.ENEMY));
+		assertTrue(pawn.validMove(5, 6, SquareStatus.ENEMY));
+		b.addPiece(pawn);
+		b.addPiece(new Pawn(5, 4, 1));
+		b.move(6, 5, 5, 4);
+		assertEquals(b.getPiece(5, 4), pawn);
 	}
 
 	public static void display(Board displayboard) {
@@ -103,10 +282,6 @@ public class RealBoardTests {
 		}
 		JOptionPane.showMessageDialog(null, new ChessView(displayboard), "Error Display View",
 				JOptionPane.WARNING_MESSAGE);
-	}
-
-	public static void display(String str) {
-		JOptionPane.showMessageDialog(null, str, "Error Message View", JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static Board getBoard() {

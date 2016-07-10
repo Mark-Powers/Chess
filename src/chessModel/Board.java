@@ -23,44 +23,55 @@ public class Board {
 	private String enPassantTarget;
 
 	public Board() {
+		this(true);
+	}
+
+	public Board(boolean preConfigure) {
 		boardWidth = 8;
 		boardHeight = 8;
 		whiteScore = 0;
 		blackScore = 0;
-		for (int i = 0; i < 8; i++) {
-			pieces.add(new Pawn(1, i, 1));
-			pieces.add(new Pawn(6, i, 0));
+
+		if (preConfigure) {
+			for (int i = 0; i < 8; i++) {
+				pieces.add(new Pawn(1, i, 1));
+				pieces.add(new Pawn(6, i, 0));
+			}
+
+			// TODO fix this
+			blackQueenSide = new Rook(0, 0, 1);
+			pieces.add(blackQueenSide);
+			blackKingSide = new Rook(0, 7, 1);
+			pieces.add(blackKingSide);
+			whiteQueenSide = new Rook(7, 0, 0);
+			pieces.add(whiteQueenSide);
+			whiteKingSide = new Rook(7, 7, 0);
+			pieces.add(whiteKingSide);
+
+			pieces.add(new Knight(0, 1, 1));
+			pieces.add(new Knight(0, 6, 1));
+			pieces.add(new Knight(7, 1, 0));
+			pieces.add(new Knight(7, 6, 0));
+			pieces.add(new Bishop(0, 2, 1));
+			pieces.add(new Bishop(0, 5, 1));
+			pieces.add(new Bishop(7, 2, 0));
+			pieces.add(new Bishop(7, 5, 0));
+			pieces.add(new Queen(0, 3, 1));
+			pieces.add(new Queen(7, 3, 0));
+			whiteKing = new King(0, 4, 1);
+			pieces.add(whiteKing);
+			blackKing = new King(7, 4, 0);
+			pieces.add(blackKing);
 		}
-		blackQueenSide = new Rook(0, 0, 1);
-		pieces.add(blackQueenSide);
-		blackKingSide = new Rook(0, 7, 1);
-		pieces.add(blackKingSide);
-		whiteQueenSide = new Rook(7, 0, 0);
-		pieces.add(whiteQueenSide);
-		whiteKingSide = new Rook(7, 7, 0);
-		pieces.add(whiteKingSide);
-		pieces.add(new Knight(0, 1, 1));
-		pieces.add(new Knight(0, 6, 1));
-		pieces.add(new Knight(7, 1, 0));
-		pieces.add(new Knight(7, 6, 0));
-		pieces.add(new Bishop(0, 2, 1));
-		pieces.add(new Bishop(0, 5, 1));
-		pieces.add(new Bishop(7, 2, 0));
-		pieces.add(new Bishop(7, 5, 0));
-		pieces.add(new Queen(0, 3, 1));
-		pieces.add(new Queen(7, 3, 0));
-		whiteKing = new King(0, 4, 1);
-		pieces.add(whiteKing);
-		blackKing = new King(7, 4, 0);
-		pieces.add(blackKing);
 
 		enPassantTarget = "";
 		movelog = new Log();
 	}
 
 	/**
-	 * Attempts to move a piece on the board. If successful,
-	 * the move is written to the Log.
+	 * Attempts to move a piece on the board. If successful, the move is written
+	 * to the Log.
+	 * 
 	 * @param oldX
 	 * @param oldY
 	 * @param x
@@ -142,9 +153,13 @@ public class Board {
 
 	/**
 	 * Checks if there is a piece between a piece and a specified square.
-	 * @param p The piece in question
-	 * @param x The x location of the other square
-	 * @param y The y location of the other square
+	 * 
+	 * @param p
+	 *            The piece in question
+	 * @param x
+	 *            The x location of the other square
+	 * @param y
+	 *            The y location of the other square
 	 * @return
 	 */
 	public boolean isObstructed(Piece p, int x, int y) {
@@ -185,7 +200,6 @@ public class Board {
 		return false;
 	}
 
-	
 	public String getBoardTable() {
 		String board = "";
 		boolean wasPrinted;
@@ -216,9 +230,13 @@ public class Board {
 
 	/**
 	 * Checks if the square is threatened by the other side.
-	 * @param x The x location of the square in question.
-	 * @param y The y location of the square in question.
-	 * @param side Which side is threatened at this location.
+	 * 
+	 * @param x
+	 *            The x location of the square in question.
+	 * @param y
+	 *            The y location of the square in question.
+	 * @param side
+	 *            Which side is threatened at this location.
 	 * @return If the location is threatened.
 	 */
 	public boolean isThreatenedSquare(int x, int y, int side) {
@@ -235,7 +253,8 @@ public class Board {
 	}
 
 	/**
-	 * @param side The side testing for check
+	 * @param side
+	 *            The side testing for check
 	 * @return If the side given is in check
 	 */
 	public boolean isInCheck(int side) {
@@ -252,7 +271,7 @@ public class Board {
 	 * @param p
 	 * @param x
 	 * @param y
-	 * @return 
+	 * @return
 	 */
 	public boolean resolvesCheck(Piece p, int x, int y) {
 		Board b = new Board();
@@ -260,7 +279,7 @@ public class Board {
 			b.move(move[0], move[1], move[2], move[3]);
 		}
 		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
-		
+
 		if (b.isInCheck(p.getSide())) {
 			return false;
 		}
@@ -269,6 +288,7 @@ public class Board {
 
 	/**
 	 * Getter for pieces
+	 * 
 	 * @return The ArrayList of pieces
 	 */
 	public ArrayList<Piece> getPieces() {
@@ -277,9 +297,12 @@ public class Board {
 
 	/**
 	 * 
-	 * @param x The x location of the square in question.
-	 * @param y The y location of the square in question.
-	 * @param side Which side is relative to this
+	 * @param x
+	 *            The x location of the square in question.
+	 * @param y
+	 *            The y location of the square in question.
+	 * @param side
+	 *            Which side is relative to this
 	 * @return The SquareStatus enum representation for
 	 */
 	public SquareStatus getSquareStatus(int x, int y, int side) {
@@ -351,13 +374,55 @@ public class Board {
 	public int getBlackScore() {
 		return blackScore;
 	}
-	
-	public int getScore(int s){
-		if (s==0){
+
+	public int getScore(int s) {
+		if (s == 0) {
 			return getWhiteScore();
 		} else {
 			return getBlackScore();
 		}
+	}
+
+	/**
+	 * Returns if the pieces have moved yet
+	 * 
+	 * @return a string which FEN can use to determine availability of castling
+	 */
+	public String castlingAvailability() {
+		StringBuilder castling = new StringBuilder();
+		if (!whiteKing.hasMoved()) {
+			if (!whiteKingSide.hasMoved()) {
+				castling.append("K");
+			}
+			if (!whiteQueenSide.hasMoved()) {
+				castling.append("Q");
+			}
+		}
+		if (!blackKing.hasMoved()) {
+			if (!blackKingSide.hasMoved()) {
+				castling.append("k");
+			}
+			if (!blackQueenSide.hasMoved()) {
+				castling.append("q");
+			}
+		}
+		if (castling.toString().isEmpty()) {
+			return "-";
+		} else {
+			return castling.toString();
+		}
+	}
+
+	public String getLogRaw() {
+		ArrayList<Integer[]> arr = movelog.getLogArray();
+		StringBuilder sb = new StringBuilder();
+		for (Integer[] integers : arr) {
+			sb.append(integers[0] + ",");
+			sb.append(integers[1] + ",");
+			sb.append(integers[2] + ",");
+			sb.append(integers[3] + "\n");
+		}
+		return sb.toString();
 	}
 
 	public String getPGN() {
@@ -421,45 +486,56 @@ public class Board {
 		return fen.toString();
 	}
 
-	public String getLogRaw() {
-		ArrayList<Integer[]> arr = movelog.getLogArray();
-		StringBuilder sb = new StringBuilder();
-		for (Integer[] integers : arr) {
-			sb.append(integers[0] + ",");
-			sb.append(integers[1] + ",");
-			sb.append(integers[2] + ",");
-			sb.append(integers[3] + "\n");
-		}
-		return sb.toString();
+	public void addPiece(Piece p) {
+		pieces.add(p);
 	}
 
-	/**
-	 * Returns if the pieces have moved yet
-	 * 
-	 * @return a string which FEN can use to determine availability of castling
-	 */
-	public String castlingAvailability() {
-		StringBuilder castling = new StringBuilder();
-		if (!whiteKing.hasMoved()) {
-			if (!whiteKingSide.hasMoved()) {
-				castling.append("K");
+	public void removePieces(Piece p) {
+		pieces.remove(p);
+	}
+
+	public void populateFromFEN(String fen) {
+		char[] charArray = fen.toCharArray();
+		int x = -1;
+		int y = 0;
+		for (int i = 0; i < charArray.length; i++) {
+			Character c = charArray[i];
+			if (c == ' ') {
+				return;
+			} else if (c == '/') {
+				y++;
+				x = -1;
+			} else if (Character.isDigit(c)) {
+				int offset = Character.getNumericValue(c);
+				x += offset;
+			} else {
+				x++;
+				int side = 0;
+				if (Character.isLowerCase(c)) {
+					side = 1;
+				}
+				c = Character.toLowerCase(c);
+				switch (c) {
+				case 'k':
+					addPiece(new King(y, x, side));
+					break;
+				case 'q':
+					addPiece(new Queen(y, x, side));
+					break;
+				case 'r':
+					addPiece(new Rook(y, x, side));
+					break;
+				case 'b':
+					addPiece(new Bishop(y, x, side));
+					break;
+				case 'n':
+					addPiece(new Knight(y, x, side));
+					break;
+				case 'p':
+					addPiece(new Pawn(y, x, side));
+					break;
+				}
 			}
-			if (!whiteQueenSide.hasMoved()) {
-				castling.append("Q");
-			}
-		}
-		if (!blackKing.hasMoved()) {
-			if (!blackKingSide.hasMoved()) {
-				castling.append("k");
-			}
-			if (!blackQueenSide.hasMoved()) {
-				castling.append("q");
-			}
-		}
-		if (castling.toString().isEmpty()) {
-			return "-";
-		} else {
-			return castling.toString();
 		}
 	}
 

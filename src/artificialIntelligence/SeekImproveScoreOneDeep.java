@@ -6,7 +6,6 @@ import javax.swing.JOptionPane;
 
 import chessModel.Board;
 import chessModel.ComputerPlayer;
-import chessModel.TestBoard;
 import chessViewController.ChessView;
 
 public class SeekImproveScoreOneDeep extends ComputerPlayer {
@@ -21,7 +20,7 @@ public class SeekImproveScoreOneDeep extends ComputerPlayer {
 			bestScore = board.getWhiteScore();
 		}
 		for (Integer[] move : allMoves) {
-			TestBoard tb = new TestBoard();
+			Board tb = new Board();
 			tb.populateFromFEN(board.getFEN());
 			if (tb.move(move[0], move[1], move[2], move[3])) {
 				if (tb.getScore(side)>bestScore){

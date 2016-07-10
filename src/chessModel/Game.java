@@ -102,8 +102,8 @@ public class Game {
 						// We create this sand-box, so the player does not have
 						// direct
 						// access to the game board
-						Board sandbox = new TestBoard();
-						((TestBoard) sandbox).populateFromFEN(board.getFEN());
+						Board sandbox = new Board();
+						sandbox.populateFromFEN(board.getFEN());
 
 						// Poll the player for a move
 						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove(sandbox);
