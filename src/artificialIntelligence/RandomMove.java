@@ -8,10 +8,6 @@ import chessModel.ComputerPlayer;
 public class RandomMove extends ComputerPlayer {
 	
 	private int delay;
-	
-	public RandomMove(int s) {
-		super("Random Player " + (s + 1), s);
-	}
 
 	@Override
 	public Integer[] getMove(Board board) {

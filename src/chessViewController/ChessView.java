@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import chessModel.Board;
 import chessModel.piece.Piece;
 
+@SuppressWarnings("serial")
 public class ChessView extends JPanel {
 
 	private Board b;

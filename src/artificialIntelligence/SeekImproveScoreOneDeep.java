@@ -1,10 +1,8 @@
 package artificialIntelligence;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import chessModel.Board;
 import chessModel.ComputerPlayer;
@@ -12,9 +10,6 @@ import chessModel.TestBoard;
 import chessViewController.ChessView;
 
 public class SeekImproveScoreOneDeep extends ComputerPlayer {
-	public SeekImproveScoreOneDeep(int s) {
-		super("Improve Score " + (s + 1), s);
-	}
 
 	@Override
 	public Integer[] getMove(Board board) {

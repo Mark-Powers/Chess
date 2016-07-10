@@ -11,7 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
@@ -31,10 +30,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
-import chessModel.HumanPlayer;
 import chessModel.Player;
 import chessModel.piece.Piece;
 
+@SuppressWarnings("serial")
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
@@ -97,6 +96,7 @@ public class GraphicsGUI extends JFrame {
 				}
 				player1Score.setText("Score: "+g.getPlayer1Score());
 				player2Score.setText("Score: "+g.getPlayer2Score());
+				chessView.repaint();
 			}
 		});
 		updateTimer.start();
@@ -182,19 +182,6 @@ public class GraphicsGUI extends JFrame {
 		};
 		
 		chessView.addMouseListener(humanInput);
-		
-		if (g.getGameMode() != Game.HUMAN_VS_HUMAN){
-			Timer redrawTimer = new Timer(10,new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (g.needsRedraw()){
-						chessView.repaint();
-					}
-				}
-			});
-			redrawTimer.start();
-		}
 	}
 
 	/**

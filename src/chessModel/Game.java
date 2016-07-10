@@ -1,10 +1,11 @@
 package chessModel;
 
+// TODO rework this stuff, as it is Desktop specific
+// HERE --------------------------------------------------------
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
+// TO HERE -----------------------------------------------------
 
 import chessModel.piece.Piece;
 
@@ -28,7 +29,7 @@ public class Game {
 
 	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
 													// hour
-	
+
 	private int invalidMovesCount;
 
 	public Game(int gameMode, Player player1, Player player2) {
@@ -39,7 +40,7 @@ public class Game {
 		this.gameMode = gameMode;
 
 		needsRedraw = false;
-		
+
 		invalidMovesCount = 0;
 
 		this.player1 = player1;
@@ -75,33 +76,52 @@ public class Game {
 		gameLoop();
 	}
 
+	/**
+	 * This method prompts the next player for a move. If the player is human,
+	 * it exits. This method exits if the next player is human and must be
+	 * called again by the GUI in order for
+	 */
 	public void gameLoop() {
 		while (!isCheckMate()) {
 			humanInputEnabled = false;
 			if (getCurrentPlayer() instanceof HumanPlayer) {
+				// exit and allow the human player to submit a move
 				humanInputEnabled = true;
 				return;
 			} else {
-
+				// Create a new thread for the computation of the next move
 				computeMove = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						if (invalidMovesCount > 9){
-							popup("Submitted invalid move ten times");
+						// Exit if the AI returns too many invalid moves
+						// (prevents infinite loop)
+						if (invalidMovesCount > 9) {
+							System.out.println("Submitted invalid move ten times");
 							System.exit(0);
 						}
+						// We create this sand-box, so the player does not have
+						// direct
+						// access to the game board
 						Board sandbox = new TestBoard();
 						((TestBoard) sandbox).populateFromFEN(board.getFEN());
-						Integer[] move = ((ComputerPlayer) getCurrentPlayer())
-								.getMove(sandbox);
-						Piece pieceToMove = board.getPiece(move[0], move[1]);
-						if (pieceToMove == null){
+
+						// Poll the player for a move
+						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove(sandbox);
+						int oldX = move[0];
+						int oldY = move[1];
+						int newX = move[2];
+						int newY = move[3];
+
+						// Get the piece on the board the player wishes to move
+						Piece pieceToMove = board.getPiece(oldX, oldY);
+
+						if (pieceToMove == null) {
+							// The AI has one less try at submitting a valid
+							// move
 							System.out.println(++invalidMovesCount);
-						} else if (pieceToMove.validMove(move[2], move[3], board
-								.getSquareStatus(pieceToMove.getX(),
-										pieceToMove.getY(),
-										pieceToMove.getSide()))) {
-							move(move[0], move[1], move[2], move[3]);
+						} else if (pieceToMove.validMove(newX, newY,
+								board.getSquareStatus(oldX, oldY, pieceToMove.getSide()))) {
+							move(oldX, oldY, newX, newY);
 							invalidMovesCount = 0;
 							needsRedraw = true;
 						} else {
@@ -113,7 +133,6 @@ public class Game {
 				return;
 			}
 		}
-		popup("Checkmate");
 	}
 
 	public Player getCurrentPlayer() {
@@ -127,7 +146,7 @@ public class Game {
 	public void move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
 		if (tmp == null) {
-			popup("AI submitted invalid move.");
+			System.out.println("Submitted invalid move ten times");
 			System.exit(0);
 		}
 		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
@@ -211,10 +230,4 @@ public class Game {
 	public void markDrawn() {
 		needsRedraw = false;
 	}
-
-	public void popup(String message) {
-		JOptionPane.showMessageDialog(null, message, "",
-				JOptionPane.PLAIN_MESSAGE);
-	}
-
 }

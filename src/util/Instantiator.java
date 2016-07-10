@@ -39,7 +39,9 @@ public class Instantiator {
 		}
 
 		try {
-			return (ComputerPlayer) AI.getDeclaredConstructor(int.class).newInstance(side);
+			ComputerPlayer instantiatedPlayer = (ComputerPlayer) AI.getDeclaredConstructor().newInstance();
+			instantiatedPlayer.init(name, side);
+			return instantiatedPlayer;
 		} catch (Exception e){
 			e.printStackTrace();
 		}

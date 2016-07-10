@@ -58,6 +58,15 @@ public class Board {
 		movelog = new Log();
 	}
 
+	/**
+	 * Attempts to move a piece on the board. If successful,
+	 * the move is written to the Log.
+	 * @param oldX
+	 * @param oldY
+	 * @param x
+	 * @param y
+	 * @return If the move was succesful
+	 */
 	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece selectedP = null;
 		Piece otherP = null;
@@ -91,7 +100,6 @@ public class Board {
 			if (!status.equals(SquareStatus.TEAM) && selectedP.validMove(x, y, status)
 					&& !isObstructed(selectedP, x, y)) {
 				if (isInCheck(selectedP.getSide())) {
-					System.out.println("test");
 					if (!resolvesCheck(selectedP, x, y)) {
 						return false;
 					}
@@ -132,6 +140,13 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Checks if there is a piece between a piece and a specified square.
+	 * @param p The piece in question
+	 * @param x The x location of the other square
+	 * @param y The y location of the other square
+	 * @return
+	 */
 	public boolean isObstructed(Piece p, int x, int y) {
 		// Must be left/right
 		if (p.getX() == x) {
@@ -170,7 +185,8 @@ public class Board {
 		return false;
 	}
 
-	public String getBoard() {
+	
+	public String getBoardTable() {
 		String board = "";
 		boolean wasPrinted;
 		board += ("  01234567\n\n");
@@ -198,6 +214,13 @@ public class Board {
 		return board;
 	}
 
+	/**
+	 * Checks if the square is threatened by the other side.
+	 * @param x The x location of the square in question.
+	 * @param y The y location of the square in question.
+	 * @param side Which side is threatened at this location.
+	 * @return If the location is threatened.
+	 */
 	public boolean isThreatenedSquare(int x, int y, int side) {
 		for (Piece p : pieces) {
 			if (p.getSide() != side) { // Only the other team can threaten a
@@ -212,8 +235,7 @@ public class Board {
 	}
 
 	/**
-	 * @param side
-	 *            The side testing for check
+	 * @param side The side testing for check
 	 * @return If the side given is in check
 	 */
 	public boolean isInCheck(int side) {
@@ -230,7 +252,7 @@ public class Board {
 	 * @param p
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return 
 	 */
 	public boolean resolvesCheck(Piece p, int x, int y) {
 		Board b = new Board();
@@ -238,19 +260,28 @@ public class Board {
 			b.move(move[0], move[1], move[2], move[3]);
 		}
 		b.getPiece(p.getX(), p.getY()).forceMove(x, y);
-		;
+		
 		if (b.isInCheck(p.getSide())) {
-			System.out.println("still in check");
 			return false;
 		}
-		System.out.println("got out of check");
 		return true;
 	}
 
+	/**
+	 * Getter for pieces
+	 * @return The ArrayList of pieces
+	 */
 	public ArrayList<Piece> getPieces() {
 		return pieces;
 	}
 
+	/**
+	 * 
+	 * @param x The x location of the square in question.
+	 * @param y The y location of the square in question.
+	 * @param side Which side is relative to this
+	 * @return The SquareStatus enum representation for
+	 */
 	public SquareStatus getSquareStatus(int x, int y, int side) {
 		SquareStatus square = SquareStatus.EMPTY;
 		for (Piece otherP : pieces) {
