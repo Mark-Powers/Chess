@@ -3,13 +3,12 @@ package artificialIntelligence;
 import java.util.ArrayList;
 
 import chessModel.Board;
-import chessModel.ComputerPlayer;
+import chessModel.Player;
 
-public class RandomMove extends ComputerPlayer {
+public class RandomMove extends Player {
 	
 	private int delay;
 
-	@Override
 	public Integer[] getMove(Board board) {
 		ArrayList<Integer[]> allMoves = board.getAllMoves(side);
 		try {

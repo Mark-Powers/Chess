@@ -4,6 +4,8 @@ package chessModel;
 // HERE --------------------------------------------------------
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+
 import javax.swing.Timer;
 // TO HERE -----------------------------------------------------
 
@@ -12,14 +14,12 @@ import chessModel.piece.Piece;
 public class Game {
 	private int currentSide;
 	private int gameMode;
-	private boolean needsRedraw;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
 	private Time player1TimeLeft;
 	private Time player2TimeLeft;
 	Player player1, player2;
-	private boolean humanInputEnabled;
 	private Thread computeMove;
 
 	// Game Modes
@@ -33,13 +33,9 @@ public class Game {
 	private int invalidMovesCount;
 
 	public Game(int gameMode, Player player1, Player player2) {
-		humanInputEnabled = false;
-
 		board = new Board();
 
 		this.gameMode = gameMode;
-
-		needsRedraw = false;
 
 		invalidMovesCount = 0;
 
@@ -62,77 +58,62 @@ public class Game {
 		});
 		side1Timer.start();
 
-		Timer checkOnCompterPlayer = new Timer(100, new ActionListener() {
+		Timer checkOnPlayer = new Timer(100, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (humanInputEnabled == false && !computeMove.isAlive()) {
-					gameLoop();
+				if (!computeMove.isAlive()) {
+					performTurn();
 				}
 			}
 		});
-		checkOnCompterPlayer.start();
-
-		gameLoop();
+		checkOnPlayer.start();
+		
+		performTurn();
 	}
 
-	/**
-	 * This method prompts the next player for a move. If the player is human,
-	 * it exits. This method exits if the next player is human and must be
-	 * called again by the GUI in order for
-	 */
-	public void gameLoop() {
-		while (!isCheckMate()) {
-			humanInputEnabled = false;
-			if (getCurrentPlayer() instanceof HumanPlayer) {
-				// exit and allow the human player to submit a move
-				humanInputEnabled = true;
-				return;
-			} else {
-				// Create a new thread for the computation of the next move
-				computeMove = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						// Exit if the AI returns too many invalid moves
-						// (prevents infinite loop)
-						if (invalidMovesCount > 9) {
-							System.out.println("Submitted invalid move ten times");
-							System.exit(0);
-						}
-						// We create this sand-box, so the player does not have
-						// direct
-						// access to the game board
-						Board sandbox = new Board();
-						sandbox.populateFromFEN(board.getFEN());
-
-						// Poll the player for a move
-						Integer[] move = ((ComputerPlayer) getCurrentPlayer()).getMove(sandbox);
-						int oldX = move[0];
-						int oldY = move[1];
-						int newX = move[2];
-						int newY = move[3];
-
-						// Get the piece on the board the player wishes to move
-						Piece pieceToMove = board.getPiece(oldX, oldY);
-
-						if (pieceToMove == null) {
-							// The AI has one less try at submitting a valid
-							// move
-							System.out.println(++invalidMovesCount);
-						} else if (pieceToMove.validMove(newX, newY,
-								board.getSquareStatus(oldX, oldY, pieceToMove.getSide()))) {
-							move(oldX, oldY, newX, newY);
-							invalidMovesCount = 0;
-							needsRedraw = true;
-						} else {
-							System.out.println("invalid move #" + ++invalidMovesCount);
-						}
-					}
-				});
-				computeMove.start();
-				return;
-			}
+	private void performTurn() {
+		// Create a new thread for the computation of the next move
+		if (computeMove != null) {
+			computeMove.interrupt();
 		}
+		computeMove = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// Exit if the AI returns too many invalid moves
+				// (prevents infinite loop)
+				if (invalidMovesCount > 9) {
+					System.exit(0);
+				}
+				// We create this sand-box, so the player does not have
+				// direct
+				// access to the game board
+				Board sandbox = new Board();
+				sandbox.populateFromFEN(board.getFEN());
+
+				// Poll the player for a move
+				Integer[] move = getCurrentPlayer().getMove(sandbox);
+				int oldX = move[0];
+				int oldY = move[1];
+				int newX = move[2];
+				int newY = move[3];
+				
+				// Get the piece on the board the player wishes to move
+				Piece pieceToMove = board.getPiece(oldX, oldY);
+
+				if (pieceToMove == null) {
+					// do nothing
+				} else if (pieceToMove.validMove(newX, newY,
+						board.getSquareStatus(oldX, oldY, pieceToMove.getSide()))) {
+					move(oldX, oldY, newX, newY);
+					invalidMovesCount = 0;
+					return;
+				}
+				invalidMovesCount++;
+				System.out.println(getCurrentPlayer().getName() + " invalid move " + invalidMovesCount);
+			}
+		});
+		computeMove.start();
 	}
 
 	public Player getCurrentPlayer() {
@@ -215,19 +196,7 @@ public class Game {
 		return (board.getAllMoves(currentSide).size() == 0);
 	}
 
-	public boolean isHumanInputEnabled() {
-		return humanInputEnabled;
-	}
-
 	public int getGameMode() {
 		return gameMode;
-	}
-
-	public boolean needsRedraw() {
-		return needsRedraw;
-	}
-
-	public void markDrawn() {
-		needsRedraw = false;
 	}
 }

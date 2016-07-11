@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -30,15 +28,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
+import chessModel.HumanPlayer;
 import chessModel.Player;
-import chessModel.piece.Piece;
 
 @SuppressWarnings("serial")
 public class GraphicsGUI extends JFrame {
 	private JMenuBar menu;
 	private JMenu file;
 	private JMenuItem save, details;
-	private Game g;
+	private Game game;
 	private ChessView chessView;
 	JLabel timer1Label;
 	JLabel timer2Label;
@@ -46,7 +44,7 @@ public class GraphicsGUI extends JFrame {
 	JLabel player2Score;
 
 	public GraphicsGUI(int gameMode, Player player1, Player player2) {
-		
+
 		// this.setResizable(false);
 		this.setMinimumSize(new Dimension(300, 300));
 
@@ -58,7 +56,7 @@ public class GraphicsGUI extends JFrame {
 		} catch (Exception e) {
 			System.out.println("Could not find native look and feel.");
 		}
-		
+
 		centerWindow();
 
 		this.setLayout(new BorderLayout());
@@ -72,30 +70,38 @@ public class GraphicsGUI extends JFrame {
 		file.add(details);
 
 		this.setJMenuBar(menu);
-						
-		g = new Game(gameMode, player1, player2);
-		
-		final Board b = g.getBoard();
 
-		chessView = new ChessView(b);
-		
-		
+		game = new Game(gameMode, player1, player2);
+
+		final Board board = game.getBoard();
+
+		chessView = new ChessView(board);
+
+		if (player1 instanceof HumanPlayer) {
+			((HumanPlayer) player1).setupView(this, chessView);
+		}
+		if (player2 instanceof HumanPlayer) {
+			((HumanPlayer) player2).setupView(this, chessView);
+		}
+
 		// Timer/Score area stuff
 		timer1Label = new JLabel("", SwingConstants.CENTER);
 		timer2Label = new JLabel("", SwingConstants.CENTER);
-		player1Score= new JLabel("", SwingConstants.CENTER);
-		player2Score= new JLabel("", SwingConstants.CENTER);
-		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10 times a second
+		player1Score = new JLabel("", SwingConstants.CENTER);
+		player2Score = new JLabel("", SwingConstants.CENTER);
+		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10
+																	// times a
+																	// second
 			public void actionPerformed(ActionEvent e) {
-				if(g.getCurrentSide()==0){
-					timer1Label.setText("<html>P1 Time: <font color='red'>"+g.getPlayer1Time()+"</font></html>");
-					timer2Label.setText("<html>P2 Time: "+g.getPlayer2Time()+"</html>");
-				} else if(g.getCurrentSide()==1){
-					timer1Label.setText("<html>P1 Time: "+g.getPlayer1Time()+"</html>");
-					timer2Label.setText("<html>P2 Time: <font color='red'>"+g.getPlayer2Time()+"</font></html>");
+				if (game.getCurrentSide() == 0) {
+					timer1Label.setText("<html>P1 Time: <font color='red'>" + game.getPlayer1Time() + "</font></html>");
+					timer2Label.setText("<html>P2 Time: " + game.getPlayer2Time() + "</html>");
+				} else if (game.getCurrentSide() == 1) {
+					timer1Label.setText("<html>P1 Time: " + game.getPlayer1Time() + "</html>");
+					timer2Label.setText("<html>P2 Time: <font color='red'>" + game.getPlayer2Time() + "</font></html>");
 				}
-				player1Score.setText("Score: "+g.getPlayer1Score());
-				player2Score.setText("Score: "+g.getPlayer2Score());
+				player1Score.setText("Score: " + game.getPlayer1Score());
+				player2Score.setText("Score: " + game.getPlayer2Score());
 				chessView.repaint();
 			}
 		});
@@ -107,8 +113,7 @@ public class GraphicsGUI extends JFrame {
 		timerScorePanel.add(player2Score);
 		timerScorePanel.add(timer2Label);
 		this.add(timerScorePanel, BorderLayout.SOUTH);
-		
-		
+
 		this.add(chessView, BorderLayout.CENTER);
 
 		pack();
@@ -129,7 +134,7 @@ public class GraphicsGUI extends JFrame {
 				try {
 					PrintWriter pw = new PrintWriter(fc.getSelectedFile());
 					StringBuilder log = new StringBuilder();
-					log.append(b.getPGN());
+					log.append(board.getPGN());
 					pw.write(log.toString());
 					pw.close();
 				} catch (FileNotFoundException e1) {
@@ -137,51 +142,39 @@ public class GraphicsGUI extends JFrame {
 				}
 			}
 		});
-		
+
 		details.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JPanel p = new JPanel();
 				p.setLayout(new BorderLayout());
-				
-				JTextArea pgn = new JTextArea("PGN:\n"+b.getPGN(),8,35);
+
+				JTextArea pgn = new JTextArea("PGN:\n" + board.getPGN(), 8, 35);
 				pgn.setEditable(false);
-				
+
 				JScrollPane pgnScrollPane = new JScrollPane(pgn);
 				pgnScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-				
-				JTextArea fen = new JTextArea("\nFen:\n"+b.getFEN()+"\n");
+
+				JTextArea fen = new JTextArea("\nFen:\n" + board.getFEN() + "\n");
 				fen.setEditable(false);
-				fen.setForeground(new Color(22,22,200));
-				
+				fen.setForeground(new Color(22, 22, 200));
+
 				JTextArea raw = new JTextArea(4, 35);
-				raw.setText("Raw Moves:\n"+b.getLogRaw());
+				raw.setText("Raw Moves:\n" + board.getLogRaw());
 				raw.setEditable(false);
-				
+
 				JScrollPane rawScrollPane = new JScrollPane(raw);
 				rawScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-								
+
 				p.add(pgnScrollPane, BorderLayout.NORTH);
 				p.add(fen, BorderLayout.CENTER);
 				p.add(rawScrollPane, BorderLayout.SOUTH);
-				
+
 				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 
-		MouseAdapter humanInput = new MouseAdapter() {
-			public void mouseReleased(MouseEvent e) {
-				int cellSize = chessView.getCellSize();
-				int xLoc = (e.getY()) / cellSize;
-				int yLoc = (e.getX()) / cellSize;
-				if (g.isHumanInputEnabled()){
-					handleLocationClicked(xLoc, yLoc);
-				}
-			}
-		};
-		
-		chessView.addMouseListener(humanInput);
 	}
 
 	/**
@@ -194,41 +187,35 @@ public class GraphicsGUI extends JFrame {
 		setLocation((int) ((screenDimensions.getWidth() - getWidth()) / 2),
 				(int) ((screenDimensions.getHeight() - getHeight()) / 2));
 	}
-	
-	public void isOver(){
-		if(g.isCheckMate()){
-			JOptionPane.showMessageDialog(this, g.getCurrentSide()+" has lost from checkmate");
-		} else if(g.isDraw()){
+
+	public void isOver() {
+		if (game.isCheckMate()) {
+			JOptionPane.showMessageDialog(this, game.getCurrentSide() + " has lost from checkmate");
+		} else if (game.isDraw()) {
 			JOptionPane.showMessageDialog(this, "It's a draw!");
-		} else if(g.getPlayer1Time().equals("0:0") || g.getPlayer2Time().equals("0:0")){
+		} else if (game.getPlayer1Time().equals("0:0") || game.getPlayer2Time().equals("0:0")) {
 			JOptionPane.showMessageDialog(this, "Time's Up!");
 		}
 	}
 
-	/**
-	 * @param xLoc
-	 * @param yLoc
-	 */
-	private void handleLocationClicked(int xLoc, int yLoc) {
-		if (chessView.getSelected() != null) {
-			g.move(chessView.getSelected().getX(), chessView.getSelected().getY(), xLoc, yLoc);
+	public Integer[] handleLocationClicked(int xLoc, int yLoc) {
+		if (chessView.getSelected() == null) {
+			chessView.setSelected(game.getBoard().getPiece(xLoc, yLoc));
+			chessView.repaint();
+			return null;
+		} else {
+			Integer[] move = new Integer[4];
+			move[0] = chessView.getSelected().getX();
+			move[1] = chessView.getSelected().getY();
+			move[2] = xLoc;
+			move[3] = yLoc;
 			chessView.setSelected(null);
 			chessView.repaint();
-			g.gameLoop();
-		} else {
-			Piece p = g.getBoard().getPiece(xLoc, yLoc);
-			if (p == null) {
-				chessView.setSelected(null);
-			} else if (p.equals(chessView.getSelected())) {
-				chessView.setSelected(null);
-			} else {
-				chessView.setSelected(p);
-			}
-			chessView.repaint();
+			return move;
 		}
 	}
-	public static void popup(String message){
+
+	public static void popup(String message) {
 		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
 	}
 }
-

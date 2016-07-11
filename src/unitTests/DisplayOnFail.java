@@ -8,6 +8,6 @@ import chessViewController.MessageCreator;
 public class DisplayOnFail extends TestWatcher {
 	@Override
 	protected void failed(Throwable e, Description description) {
-		MessageCreator.display(RealBoardTests.getBoard());
+		MessageCreator.display(BoardTests.getBoard());
 	}
 }

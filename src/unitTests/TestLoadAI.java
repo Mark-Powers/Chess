@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import chessModel.ComputerPlayer;
+import chessModel.Player;
 import util.Instantiator;
 
 public class TestLoadAI {
@@ -24,8 +24,8 @@ public class TestLoadAI {
 			}
 			File f = files[0];
 			String className = "artificialIntelligence" + "." + f.getName().substring(0,f.getName().indexOf("."));
-			ComputerPlayer cp = Instantiator.makeComputerPlayer(f.getPath(), className, 0);
-			assertTrue(cp instanceof ComputerPlayer);
+			Player cp = Instantiator.makePlayer(f.getPath(), className, 0);
+			assertTrue(cp instanceof Player);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("Exception occured");

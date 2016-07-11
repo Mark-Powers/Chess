@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import chessModel.Board;
-import chessModel.ComputerPlayer;
+import chessModel.Player;
 import chessViewController.ChessView;
 
-public class SeekImproveScoreOneDeep extends ComputerPlayer {
+public class SeekImproveScoreOneDeep extends Player {
 
 	@Override
 	public Integer[] getMove(Board board) {

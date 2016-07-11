@@ -111,7 +111,7 @@ public class Launcher {
 			File f1 = files[playerPicker1.getSelectedIndex()];
 			String className1 = "artificialIntelligence" + "."
 					+ f1.getName().substring(0, f1.getName().indexOf("."));
-			p1 = Instantiator.makeComputerPlayer(f1.getPath(), className1, 0);
+			p1 = Instantiator.makePlayer(f1.getPath(), className1, 0);
 		} else {
 			p1 = new HumanPlayer();
 			p1.init("Human Player 1", 0);
@@ -120,7 +120,7 @@ public class Launcher {
 			File f2 = files[playerPicker2.getSelectedIndex()];
 			String className2 = "artificialIntelligence" + "."
 					+ f2.getName().substring(0, f2.getName().indexOf("."));
-			p2 = Instantiator.makeComputerPlayer(f2.getPath(), className2, 1);
+			p2 = Instantiator.makePlayer(f2.getPath(), className2, 1);
 		} else {
 			p2 = new HumanPlayer();
 			p2.init("Human Player 2", 1);

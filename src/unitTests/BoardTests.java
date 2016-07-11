@@ -1,11 +1,13 @@
 package unitTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.junit.Before;
@@ -21,9 +23,8 @@ import chessModel.piece.Knight;
 import chessModel.piece.Pawn;
 import chessModel.piece.Piece;
 import chessModel.piece.Rook;
-import chessViewController.ChessView;
 
-public class RealBoardTests {
+public class BoardTests {
 
 	private static Board b = new Board();
 
@@ -274,14 +275,6 @@ public class RealBoardTests {
 		b.addPiece(new Pawn(5, 4, 1));
 		b.move(6, 5, 5, 4);
 		assertEquals(b.getPiece(5, 4), pawn);
-	}
-
-	public static void display(Board displayboard) {
-		if (displayboard.getPieces().size() == 0) {
-			return;
-		}
-		JOptionPane.showMessageDialog(null, new ChessView(displayboard), "Error Display View",
-				JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static Board getBoard() {
