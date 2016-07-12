@@ -94,7 +94,6 @@ public class BoardTests {
 			if (move == null) {
 				fail("Move " + i + " the move was null.");
 			}
-			System.out.println(move[0] + "," + move[1]);
 			Piece p = b.getPiece(move[0], move[1]);
 			if (p == null) {
 				fail("Move " + i + " in list failed because the piece was invalid.");
@@ -102,6 +101,9 @@ public class BoardTests {
 			assertTrue("Move " + i + " in list failed.",
 					p.validMove(move[2], move[3], b.getSquareStatus(move[2], move[3], 0)));
 			i++;
+			Board test = new Board();
+			assertTrue(test.move(move[0], move[1],move[2], move[3]));
+			
 		}
 	}
 

@@ -4,7 +4,6 @@ package chessModel;
 // HERE --------------------------------------------------------
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.Timer;
 // TO HERE -----------------------------------------------------
@@ -21,6 +20,8 @@ public class Game {
 	private Time player2TimeLeft;
 	Player player1, player2;
 	private Thread computeMove;
+	private int winner;
+	private Timer advanceTurnTimer;
 
 	// Game Modes
 	public static int HUMAN_VS_AI = 0;
@@ -29,6 +30,7 @@ public class Game {
 
 	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
 													// hour
+	private static final int MAXINVALIDMOVES = 10;
 
 	private int invalidMovesCount;
 
@@ -37,12 +39,16 @@ public class Game {
 
 		this.gameMode = gameMode;
 
-		invalidMovesCount = 0;
+		invalidMovesCount = 1;
 
 		this.player1 = player1;
 		this.player2 = player2;
 
 		currentSide = 0;
+
+		// -1 means nobody has won yet
+		winner = -1;
+
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);
 
@@ -58,33 +64,42 @@ public class Game {
 		});
 		side1Timer.start();
 
-		Timer checkOnPlayer = new Timer(100, new ActionListener() {
+		advanceTurnTimer = new Timer(100, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (winner != -1){
+					System.out.println("Winner is " +(currentSide+1));
+					advanceTurnTimer.stop();
+				}
 				if (!computeMove.isAlive()) {
 					performTurn();
 				}
 			}
 		});
-		checkOnPlayer.start();
-		
+		advanceTurnTimer.start();
+
 		performTurn();
 	}
 
 	private void performTurn() {
-		// Create a new thread for the computation of the next move
 		if (computeMove != null) {
 			computeMove.interrupt();
 		}
+		
+		if (invalidMovesCount > MAXINVALIDMOVES){
+			System.out.println();
+			if (currentSide == 0){
+				winner = 1;
+			}
+			if (currentSide == 1){
+				winner = 0;
+			}
+		}
+		
 		computeMove = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// Exit if the AI returns too many invalid moves
-				// (prevents infinite loop)
-				if (invalidMovesCount > 9) {
-					System.exit(0);
-				}
 				// We create this sand-box, so the player does not have
 				// direct
 				// access to the game board
@@ -97,23 +112,45 @@ public class Game {
 				int oldY = move[1];
 				int newX = move[2];
 				int newY = move[3];
-				
-				// Get the piece on the board the player wishes to move
-				Piece pieceToMove = board.getPiece(oldX, oldY);
 
-				if (pieceToMove == null) {
-					// do nothing
-				} else if (pieceToMove.validMove(newX, newY,
-						board.getSquareStatus(oldX, oldY, pieceToMove.getSide()))) {
-					move(oldX, oldY, newX, newY);
-					invalidMovesCount = 0;
+				Piece piece = board.getPiece(move[0], move[1]);
+
+				boolean validPiece = true;
+				if (piece == null) {
+					validPiece = false;
+				} else {
+					if (piece.getSide() != currentSide) {
+						validPiece = false;
+					}
+				}
+
+				if (!validPiece) {
+					incrementInvalidMoves();
 					return;
 				}
-				invalidMovesCount++;
-				System.out.println(getCurrentPlayer().getName() + " invalid move " + invalidMovesCount);
+
+				if (!move(oldX, oldY, newX, newY)) {
+					incrementInvalidMoves();
+				} else {
+					invalidMovesCount = 1;
+				}
 			}
 		});
 		computeMove.start();
+	}
+
+	public void incrementInvalidMoves() {
+		if (getCurrentPlayer() instanceof HumanPlayer){
+			// human players aren't punished
+			return;
+		}
+		if (invalidMovesCount == 1) {
+			String playerName = getCurrentPlayer().getName();
+			System.out.print("\n"+ playerName + " submitted invalid 1");
+		} else if (invalidMovesCount <= MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount);
+		}
+		invalidMovesCount++;
 	}
 
 	public Player getCurrentPlayer() {
@@ -124,13 +161,14 @@ public class Game {
 		}
 	}
 
-	public void move(int oldX, int oldY, int x, int y) {
+	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
 		if (tmp == null) {
-			System.out.println("Submitted invalid move ten times");
-			System.exit(0);
+			System.out.println("null piece");
+			return false;
 		}
-		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
+		boolean moveSuccess = board.move(oldX, oldY, x, y);
+		if (tmp.getSide() == currentSide && moveSuccess) {
 			if (currentSide == 0) {
 				currentSide = 1;
 				side1Timer.stop();
@@ -141,6 +179,7 @@ public class Game {
 				side1Timer.start();
 			}
 		}
+		return moveSuccess;
 	}
 
 	public Board getBoard() {

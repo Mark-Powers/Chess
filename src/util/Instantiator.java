@@ -39,7 +39,7 @@ public class Instantiator {
 
 		try {
 			Player instantiatedPlayer = (Player) AI.getDeclaredConstructor().newInstance();
-			instantiatedPlayer.init(name, side);
+			instantiatedPlayer.init(name.substring(name.indexOf(".")+1,name.length()) + "-" + (side+1), side);
 			return instantiatedPlayer;
 		} catch (Exception e){
 			e.printStackTrace();

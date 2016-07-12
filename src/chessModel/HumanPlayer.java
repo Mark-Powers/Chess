@@ -2,7 +2,6 @@ package chessModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 import chessViewController.ChessView;
 import chessViewController.GraphicsGUI;
@@ -22,7 +21,6 @@ public class HumanPlayer extends Player {
 				int xLoc = (e.getY()) / cellSize;
 				int yLoc = (e.getX()) / cellSize;	
 				move = gui.handleLocationClicked(xLoc, yLoc);
-				System.out.println("clicked" + name);
 			}
 		};
 
