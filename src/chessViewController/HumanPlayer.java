@@ -1,10 +1,10 @@
-package chessModel;
+package chessViewController;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import chessViewController.ChessView;
-import chessViewController.GraphicsGUI;
+import chessModel.Board;
+import chessModel.Player;
 
 public class HumanPlayer extends Player {
 
@@ -12,7 +12,6 @@ public class HumanPlayer extends Player {
 	private GraphicsGUI gui;
 	private Integer[] move;
 	private MouseAdapter humanInput;
-	private boolean enabled;
 
 	public void setupView(GraphicsGUI theGui, ChessView theView) {
 		view = theView;
@@ -29,10 +28,6 @@ public class HumanPlayer extends Player {
 		};
 
 		view.addMouseListener(humanInput);
-	}
-
-	public void setEnabled(boolean setEnabled) {
-		enabled = setEnabled;
 	}
 
 	@Override

@@ -86,7 +86,7 @@ public class Board {
 		selectedP = getPiece(oldX, oldY);
 
 		// create a row-file string for the place the piece is moving to
-		String selectedPLocationString = ChessUtil.convertChar(y) + "" + ChessUtil.convertRow(x);
+		String selectedPLocationString = ChessUtil.convertFile(y) + "" + ChessUtil.convertRow(x);
 
 		if (selectedP != null) {
 			otherP = getPiece(x, y);
@@ -120,7 +120,7 @@ public class Board {
 				if (selectedP instanceof Pawn) {
 					movelog.resetHalfMoveClock();
 					if (Math.abs(oldX - x) == 2) {
-						enPassantTarget = ChessUtil.convertChar(y)
+						enPassantTarget = ChessUtil.convertFile(y)
 								+ String.valueOf(ChessUtil.convertRow((oldX + x) / 2));
 					} else {
 						enPassantTarget = "";
@@ -144,7 +144,7 @@ public class Board {
 				numsForLog[1] = oldY;
 				numsForLog[2] = x;
 				numsForLog[3] = y;
-				movelog.addToLog(oldX, oldY, x, y);
+				movelog.addToLog(oldX, oldY, x, y,selectedP,otherP);
 				return true;
 			}
 		}

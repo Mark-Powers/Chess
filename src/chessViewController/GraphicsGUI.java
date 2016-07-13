@@ -28,7 +28,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import chessModel.Board;
 import chessModel.Game;
-import chessModel.HumanPlayer;
 import chessModel.Player;
 
 @SuppressWarnings("serial")
@@ -38,6 +37,7 @@ public class GraphicsGUI extends JFrame {
 	private JMenuItem save, details;
 	private Game game;
 	private ChessView chessView;
+	private Timer updateTimer;
 	JLabel timer1Label;
 	JLabel timer2Label;
 	JLabel player1Score;
@@ -90,7 +90,7 @@ public class GraphicsGUI extends JFrame {
 		timer2Label = new JLabel("", SwingConstants.CENTER);
 		player1Score = new JLabel("", SwingConstants.CENTER);
 		player2Score = new JLabel("", SwingConstants.CENTER);
-		Timer updateTimer = new Timer(100, new ActionListener() { // Updated 10
+		updateTimer = new Timer(100, new ActionListener() { // Updated 10
 																	// times a
 																	// second
 			public void actionPerformed(ActionEvent e) {
@@ -103,6 +103,7 @@ public class GraphicsGUI extends JFrame {
 				}
 				player1Score.setText("Score: " + game.getPlayer1Score());
 				player2Score.setText("Score: " + game.getPlayer2Score());
+				isOver();
 				chessView.repaint();
 			}
 		});
@@ -190,12 +191,14 @@ public class GraphicsGUI extends JFrame {
 	}
 
 	public void isOver() {
-		if (game.isCheckMate()) {
-			JOptionPane.showMessageDialog(this, game.getCurrentSide() + " has lost from checkmate");
-		} else if (game.isDraw()) {
-			JOptionPane.showMessageDialog(this, "It's a draw!");
-		} else if (game.getPlayer1Time().equals("0:0") || game.getPlayer2Time().equals("0:0")) {
-			JOptionPane.showMessageDialog(this, "Time's Up!");
+		if (game.getWinner()!=-1){
+			if (game.getInvalidMovesCount() >= Game.MAXINVALIDMOVES){
+				JOptionPane.showMessageDialog(null, "Winner is player " + (game.getWinner() + 1)+
+						"\nAI submitted too many invalid moves.");
+			} else {
+				JOptionPane.showMessageDialog(null, "Winner is player " + (game.getWinner() + 1));
+			}
+			updateTimer.stop();
 		}
 	}
 

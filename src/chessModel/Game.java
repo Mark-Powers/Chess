@@ -9,6 +9,7 @@ import javax.swing.Timer;
 // TO HERE -----------------------------------------------------
 
 import chessModel.piece.Piece;
+import chessViewController.HumanPlayer;
 
 public class Game {
 	private int currentSide;
@@ -30,7 +31,7 @@ public class Game {
 
 	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
 													// hour
-	private static final int MAXINVALIDMOVES = 10;
+	public static final int MAXINVALIDMOVES = 10;
 
 	private int invalidMovesCount;
 
@@ -69,7 +70,6 @@ public class Game {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (winner != -1){
-					System.out.println("Winner is " +(currentSide+1));
 					advanceTurnTimer.stop();
 				}
 				if (!computeMove.isAlive()) {
@@ -78,10 +78,6 @@ public class Game {
 			}
 		});
 		advanceTurnTimer.start();
-
-		if (player2 instanceof HumanPlayer){
-			((HumanPlayer) getCurrentPlayer()).setEnabled(false);
-		}
 		
 		performTurn();
 	}
@@ -92,13 +88,8 @@ public class Game {
 		}
 		
 		if (invalidMovesCount > MAXINVALIDMOVES){
-			System.out.println();
-			if (currentSide == 0){
-				winner = 1;
-			}
-			if (currentSide == 1){
-				winner = 0;
-			}
+			winner = binaryOpposite(currentSide);
+			return;
 		}
 		
 		computeMove = new Thread(new Runnable() {
@@ -169,7 +160,6 @@ public class Game {
 	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
 		if (tmp == null) {
-			System.out.println("null piece");
 			return false;
 		}
 		boolean moveSuccess = board.move(oldX, oldY, x, y);
@@ -242,5 +232,21 @@ public class Game {
 
 	public int getGameMode() {
 		return gameMode;
+	}
+
+	public int getWinner() {
+		return winner;
+	}
+	
+	public int binaryOpposite(int num){
+		if (num == 0){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	public int getInvalidMovesCount(){
+		return invalidMovesCount;
 	}
 }
