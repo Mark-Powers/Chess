@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -78,10 +79,14 @@ public class Launcher {
 
 		// Create a panel add the components
 		panel = new JPanel();
-		panel.setLayout(new GridLayout(5, 1));
+		panel.setLayout(new GridLayout(8, 1));
+		panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 		panel.add(title);
+		panel.add(new JLabel("Game Mode:"));
 		panel.add(selectMode);
+		panel.add(new JLabel("AI One:"));
 		panel.add(playerPicker1);
+		panel.add(new JLabel("AI Two:"));
 		panel.add(playerPicker2);
 		panel.add(submit);
 
@@ -95,8 +100,31 @@ public class Launcher {
 		launcherFrame.setSize(new Dimension(200, 200));
 		launcherFrame.setLocationRelativeTo(null); // center it
 		
-		selectMode.setSelectedIndex(1);
-
+		playerPicker1.setEnabled(false);
+		
+		selectMode.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (e.getActionCommand().equals("comboBoxChanged")){
+					switch (selectMode.getSelectedIndex()) {
+					case 0:
+						playerPicker1.setEnabled(false);
+						playerPicker2.setEnabled(true);
+						break;
+					case 1:
+						playerPicker1.setEnabled(false);
+						playerPicker2.setEnabled(false);
+						break;
+					case 2:
+						playerPicker1.setEnabled(true);
+						playerPicker2.setEnabled(true);
+						break;
+					}
+				}
+			}
+		});
+		
 		// handle submit button
 		submit.addActionListener(new ActionListener() {
 			@Override
