@@ -87,7 +87,7 @@ public class Game {
 			computeMove.interrupt();
 		}
 		
-		if (invalidMovesCount > MAXINVALIDMOVES){
+		if (invalidMovesCount > MAXINVALIDMOVES || isCheckMate()){
 			winner = binaryOpposite(currentSide);
 			return;
 		}
