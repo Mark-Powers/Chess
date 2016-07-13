@@ -77,12 +77,13 @@ public class GraphicsGUI extends JFrame {
 
 		chessView = new ChessView(board);
 
-		if (player1 instanceof HumanPlayer) {
-			((HumanPlayer) player1).setupView(this, chessView);
-		}
 		if (player2 instanceof HumanPlayer) {
 			((HumanPlayer) player2).setupView(this, chessView);
 		}
+		if (player1 instanceof HumanPlayer) {
+			((HumanPlayer) player1).setupView(this, chessView);
+		}
+		
 
 		// Timer/Score area stuff
 		timer1Label = new JLabel("", SwingConstants.CENTER);
@@ -217,5 +218,9 @@ public class GraphicsGUI extends JFrame {
 
 	public static void popup(String message) {
 		JOptionPane.showMessageDialog(null, message, "", JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	public int getCurrentSide(){
+		return game.getCurrentSide();
 	}
 }

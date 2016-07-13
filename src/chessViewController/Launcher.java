@@ -94,6 +94,8 @@ public class Launcher {
 		launcherFrame.pack();
 		launcherFrame.setSize(new Dimension(200, 200));
 		launcherFrame.setLocationRelativeTo(null); // center it
+		
+		selectMode.setSelectedIndex(1);
 
 		// handle submit button
 		submit.addActionListener(new ActionListener() {

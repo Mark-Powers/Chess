@@ -11,25 +11,33 @@ public class HumanPlayer extends Player {
 	private ChessView view;
 	private GraphicsGUI gui;
 	private Integer[] move;
+	private MouseAdapter humanInput;
+	private boolean enabled;
 
 	public void setupView(GraphicsGUI theGui, ChessView theView) {
 		view = theView;
 		gui = theGui;
-		MouseAdapter humanInput = new MouseAdapter() {
+		humanInput = new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
-				int cellSize = view.getCellSize();
-				int xLoc = (e.getY()) / cellSize;
-				int yLoc = (e.getX()) / cellSize;	
-				move = gui.handleLocationClicked(xLoc, yLoc);
+				if (gui.getCurrentSide() == side) {
+					int cellSize = view.getCellSize();
+					int xLoc = (e.getY()) / cellSize;
+					int yLoc = (e.getX()) / cellSize;
+					move = gui.handleLocationClicked(xLoc, yLoc);
+				}
 			}
 		};
 
 		view.addMouseListener(humanInput);
 	}
 
+	public void setEnabled(boolean setEnabled) {
+		enabled = setEnabled;
+	}
+
 	@Override
 	public Integer[] getMove(Board board) {
-		while (move == null){
+		while (move == null) {
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {

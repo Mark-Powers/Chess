@@ -79,9 +79,13 @@ public class Game {
 		});
 		advanceTurnTimer.start();
 
+		if (player2 instanceof HumanPlayer){
+			((HumanPlayer) getCurrentPlayer()).setEnabled(false);
+		}
+		
 		performTurn();
 	}
-
+	
 	private void performTurn() {
 		if (computeMove != null) {
 			computeMove.interrupt();
@@ -105,9 +109,10 @@ public class Game {
 				// access to the game board
 				Board sandbox = new Board();
 				sandbox.populateFromFEN(board.getFEN());
-
+				
 				// Poll the player for a move
 				Integer[] move = getCurrentPlayer().getMove(sandbox);
+				
 				int oldX = move[0];
 				int oldY = move[1];
 				int newX = move[2];
