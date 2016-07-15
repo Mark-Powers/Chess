@@ -31,7 +31,7 @@ public class Game {
 
 	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
 													// hour
-	public static final int MAXINVALIDMOVES = 10;
+	public static final int MAXINVALIDMOVES = 25;
 
 	private int invalidMovesCount;
 
@@ -69,7 +69,7 @@ public class Game {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (winner != -1){
+				if (winner != -1) {
 					advanceTurnTimer.stop();
 				}
 				if (!computeMove.isAlive()) {
@@ -78,20 +78,20 @@ public class Game {
 			}
 		});
 		advanceTurnTimer.start();
-		
+
 		performTurn();
 	}
-	
+
 	private void performTurn() {
 		if (computeMove != null) {
 			computeMove.interrupt();
 		}
-		
-		if (invalidMovesCount > MAXINVALIDMOVES || isCheckMate()){
+
+		if (invalidMovesCount > MAXINVALIDMOVES || isCheckMate()) {
 			winner = binaryOpposite(currentSide);
 			return;
 		}
-		
+
 		computeMove = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -100,10 +100,10 @@ public class Game {
 				// access to the game board
 				Board sandbox = new Board();
 				sandbox.populateFromFEN(board.getFEN());
-				
+
 				// Poll the player for a move
 				Integer[] move = getCurrentPlayer().getMove(sandbox);
-				
+
 				int oldX = move[0];
 				int oldY = move[1];
 				int newX = move[2];
@@ -128,6 +128,9 @@ public class Game {
 				if (!move(oldX, oldY, newX, newY)) {
 					incrementInvalidMoves();
 				} else {
+					if (invalidMovesCount != 1) {
+						System.out.println();
+					}
 					invalidMovesCount = 1;
 				}
 			}
@@ -136,15 +139,17 @@ public class Game {
 	}
 
 	public void incrementInvalidMoves() {
-		if (getCurrentPlayer() instanceof HumanPlayer){
+		if (getCurrentPlayer() instanceof HumanPlayer) {
 			// human players aren't punished
 			return;
 		}
 		if (invalidMovesCount == 1) {
 			String playerName = getCurrentPlayer().getName();
-			System.out.print("\n"+ playerName + " submitted invalid 1");
-		} else if (invalidMovesCount <= MAXINVALIDMOVES) {
+			System.out.print(playerName + " submitted invalid 1");
+		} else if (invalidMovesCount < MAXINVALIDMOVES) {
 			System.out.print(" " + invalidMovesCount);
+		} else if (invalidMovesCount == MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount + "\n");
 		}
 		invalidMovesCount++;
 	}
@@ -237,16 +242,16 @@ public class Game {
 	public int getWinner() {
 		return winner;
 	}
-	
-	public int binaryOpposite(int num){
-		if (num == 0){
+
+	public int binaryOpposite(int num) {
+		if (num == 0) {
 			return 1;
 		} else {
 			return 0;
 		}
 	}
-	
-	public int getInvalidMovesCount(){
+
+	public int getInvalidMovesCount() {
 		return invalidMovesCount;
 	}
 }
