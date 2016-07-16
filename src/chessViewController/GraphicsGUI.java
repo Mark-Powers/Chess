@@ -151,27 +151,43 @@ public class GraphicsGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				JPanel p = new JPanel();
 				p.setLayout(new BorderLayout());
+				p.setSize(200,200);
 
 				JTextArea pgn = new JTextArea("PGN:\n" + board.getPGN(), 8, 35);
 				pgn.setEditable(false);
 
 				JScrollPane pgnScrollPane = new JScrollPane(pgn);
 				pgnScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-				JTextArea fen = new JTextArea("\nFen:\n" + board.getFEN() + "\n");
+				
+				JTextArea fen = new JTextArea(board.getFEN());
 				fen.setEditable(false);
 				fen.setForeground(new Color(22, 22, 200));
 
 				JTextArea raw = new JTextArea(4, 35);
-				raw.setText("Raw Moves:\n" + board.getLogRaw());
+				raw.setText(board.getLogRaw());
 				raw.setEditable(false);
 
 				JScrollPane rawScrollPane = new JScrollPane(raw);
 				rawScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-				p.add(pgnScrollPane, BorderLayout.NORTH);
-				p.add(fen, BorderLayout.CENTER);
-				p.add(rawScrollPane, BorderLayout.SOUTH);
+				
+				JPanel pgnPanel = new JPanel();
+				pgnPanel.setLayout(new BorderLayout());
+				pgnPanel.add(new JLabel("PGN:"), BorderLayout.NORTH);
+				pgnPanel.add(pgnScrollPane, BorderLayout.SOUTH);
+				JPanel fenPanel = new JPanel();
+				fenPanel.setLayout(new BorderLayout());
+				fenPanel.add(new JLabel("FEN:"), BorderLayout.NORTH);
+				fenPanel.add(fen, BorderLayout.SOUTH);
+				JPanel rawMovesPanel = new JPanel();
+				rawMovesPanel.setLayout(new BorderLayout());
+				rawMovesPanel.add(new JLabel("Raw Moves:"), BorderLayout.NORTH);
+				rawMovesPanel.add(rawScrollPane, BorderLayout.SOUTH);
+				
+				
+				
+				p.add(pgnPanel, BorderLayout.NORTH);
+				p.add(fenPanel, BorderLayout.CENTER);
+				p.add(rawMovesPanel, BorderLayout.SOUTH);
 
 				JOptionPane.showMessageDialog(null, p, "Details", JOptionPane.PLAIN_MESSAGE);
 			}

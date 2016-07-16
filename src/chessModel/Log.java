@@ -84,14 +84,14 @@ public class Log {
 	public String toPGN() {
 		StringBuilder logText = new StringBuilder();
 		logText.append("[Date \"" + date + "\"]\r\n");
-		logText.append("[Time \"" + time + "\"]\r\n\r\n");
+		logText.append("[Time \"" + time + "\"]\r\n");
 		if (player1 != null){
-			logText.append("[White \"" + player1 + "\"]\r\n\r\n");
+			logText.append("[White \"" + player1 + "\"]\r\n");
 		}
 		if (player2 != null){
-			logText.append("[Black \"" + player2 + "\"]\r\n\r\n");
+			logText.append("[Black \"" + player2 + "\"]\r\n");
 		}
-
+		logText.append("\r\n");
 		int moveNo = 1;
 		for (String entry : sanlog) {
 			int side = moveNo % 2;
