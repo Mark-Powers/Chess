@@ -7,10 +7,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
 import javax.swing.JOptionPane;
 
-import chessModel.ComputerPlayer;
+import chessModel.Player;
 
 public class Instantiator {
 	private static URLClassLoader loader;
@@ -29,7 +28,7 @@ public class Instantiator {
 		return null;
 	}
 
-	public static ComputerPlayer makeComputerPlayer(String location, String name, int side) {
+	public static Player makePlayer(String location, String name, int side) {
 
 		Class<?> AI = null;
 		try {
@@ -39,7 +38,9 @@ public class Instantiator {
 		}
 
 		try {
-			return (ComputerPlayer) AI.getDeclaredConstructor(int.class).newInstance(side);
+			Player instantiatedPlayer = (Player) AI.getDeclaredConstructor().newInstance();
+			instantiatedPlayer.init(name.substring(name.indexOf(".")+1,name.length()) + "-" + (side+1), side);
+			return instantiatedPlayer;
 		} catch (Exception e){
 			e.printStackTrace();
 		}

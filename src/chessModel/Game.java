@@ -1,25 +1,28 @@
 package chessModel;
 
+// TODO rework this stuff, as it is Desktop specific
+// HERE --------------------------------------------------------
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
+// TO HERE -----------------------------------------------------
 
 import chessModel.piece.Piece;
+import chessViewController.HumanPlayer;
 
 public class Game {
 	private int currentSide;
 	private int gameMode;
-	private boolean needsRedraw;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
 	private Time player1TimeLeft;
 	private Time player2TimeLeft;
 	Player player1, player2;
-	private boolean humanInputEnabled;
 	private Thread computeMove;
+	private int winner;
+	private Timer advanceTurnTimer;
 
 	// Game Modes
 	public static int HUMAN_VS_AI = 0;
@@ -28,24 +31,27 @@ public class Game {
 
 	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
 													// hour
-	
+	public static final int MAXINVALIDMOVES = 25;
+
 	private int invalidMovesCount;
 
 	public Game(int gameMode, Player player1, Player player2) {
-		humanInputEnabled = false;
-
 		board = new Board();
 
 		this.gameMode = gameMode;
 
-		needsRedraw = false;
-		
-		invalidMovesCount = 0;
+		invalidMovesCount = 1;
 
 		this.player1 = player1;
 		this.player2 = player2;
 
 		currentSide = 0;
+
+		// -1 means nobody has won yet
+		winner = -1;
+		
+		board.setPlayerNames(player1.getName(), player2.getName());
+
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);
 
@@ -61,59 +67,93 @@ public class Game {
 		});
 		side1Timer.start();
 
-		Timer checkOnCompterPlayer = new Timer(100, new ActionListener() {
+		advanceTurnTimer = new Timer(100, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (humanInputEnabled == false && !computeMove.isAlive()) {
-					gameLoop();
+				if (winner != -1) {
+					advanceTurnTimer.stop();
+				}
+				if (!computeMove.isAlive()) {
+					performTurn();
 				}
 			}
 		});
-		checkOnCompterPlayer.start();
+		advanceTurnTimer.start();
 
-		gameLoop();
+		performTurn();
 	}
 
-	public void gameLoop() {
-		while (!isCheckMate()) {
-			humanInputEnabled = false;
-			if (getCurrentPlayer() instanceof HumanPlayer) {
-				humanInputEnabled = true;
-				return;
-			} else {
-
-				computeMove = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						if (invalidMovesCount > 9){
-							popup("Submitted invalid move ten times");
-							System.exit(0);
-						}
-						Board sandbox = new TestBoard();
-						((TestBoard) sandbox).populateFromFEN(board.getFEN());
-						Integer[] move = ((ComputerPlayer) getCurrentPlayer())
-								.getMove(sandbox);
-						Piece pieceToMove = board.getPiece(move[0], move[1]);
-						if (pieceToMove == null){
-							System.out.println(++invalidMovesCount);
-						} else if (pieceToMove.validMove(move[2], move[3], board
-								.getSquareStatus(pieceToMove.getX(),
-										pieceToMove.getY(),
-										pieceToMove.getSide()))) {
-							move(move[0], move[1], move[2], move[3]);
-							invalidMovesCount = 0;
-							needsRedraw = true;
-						} else {
-							System.out.println("invalid move #" + ++invalidMovesCount);
-						}
-					}
-				});
-				computeMove.start();
-				return;
-			}
+	private void performTurn() {
+		if (computeMove != null) {
+			computeMove.interrupt();
 		}
-		popup("Checkmate");
+
+		if (invalidMovesCount > MAXINVALIDMOVES || isCheckMate()) {
+			winner = binaryOpposite(currentSide);
+			return;
+		}
+
+		computeMove = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// We create this sand-box, so the player does not have
+				// direct
+				// access to the game board
+				Board sandbox = new Board();
+				sandbox.populateFromFEN(board.getFEN());
+
+				// Poll the player for a move
+				Integer[] move = getCurrentPlayer().getMove(sandbox);
+
+				int oldX = move[0];
+				int oldY = move[1];
+				int newX = move[2];
+				int newY = move[3];
+
+				Piece piece = board.getPiece(move[0], move[1]);
+
+				boolean validPiece = true;
+				if (piece == null) {
+					validPiece = false;
+				} else {
+					if (piece.getSide() != currentSide) {
+						validPiece = false;
+					}
+				}
+
+				if (!validPiece) {
+					incrementInvalidMoves();
+					return;
+				}
+
+				if (!move(oldX, oldY, newX, newY)) {
+					incrementInvalidMoves();
+				} else {
+					if (invalidMovesCount != 1) {
+						System.out.println();
+					}
+					invalidMovesCount = 1;
+				}
+			}
+		});
+		computeMove.start();
+	}
+
+	public void incrementInvalidMoves() {
+		if (getCurrentPlayer() instanceof HumanPlayer) {
+			// human players aren't punished
+			return;
+		}
+		if (invalidMovesCount == 1) {
+			String playerName = getCurrentPlayer().getName();
+			System.out.print(playerName + " submitted invalid 1");
+		} else if (invalidMovesCount < MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount);
+		} else if (invalidMovesCount == MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount + "\n");
+		}
+		invalidMovesCount++;
 	}
 
 	public Player getCurrentPlayer() {
@@ -124,13 +164,13 @@ public class Game {
 		}
 	}
 
-	public void move(int oldX, int oldY, int x, int y) {
+	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
 		if (tmp == null) {
-			popup("AI submitted invalid move.");
-			System.exit(0);
+			return false;
 		}
-		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
+		boolean moveSuccess = board.move(oldX, oldY, x, y);
+		if (tmp.getSide() == currentSide && moveSuccess) {
 			if (currentSide == 0) {
 				currentSide = 1;
 				side1Timer.stop();
@@ -141,6 +181,7 @@ public class Game {
 				side1Timer.start();
 			}
 		}
+		return moveSuccess;
 	}
 
 	public Board getBoard() {
@@ -196,25 +237,23 @@ public class Game {
 		return (board.getAllMoves(currentSide).size() == 0);
 	}
 
-	public boolean isHumanInputEnabled() {
-		return humanInputEnabled;
-	}
-
 	public int getGameMode() {
 		return gameMode;
 	}
 
-	public boolean needsRedraw() {
-		return needsRedraw;
+	public int getWinner() {
+		return winner;
 	}
 
-	public void markDrawn() {
-		needsRedraw = false;
+	public int binaryOpposite(int num) {
+		if (num == 0) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
-	public void popup(String message) {
-		JOptionPane.showMessageDialog(null, message, "",
-				JOptionPane.PLAIN_MESSAGE);
+	public int getInvalidMovesCount() {
+		return invalidMovesCount;
 	}
-
 }

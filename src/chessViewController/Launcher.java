@@ -5,11 +5,14 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -19,13 +22,16 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import chessModel.Game;
-import chessModel.HumanPlayer;
 import chessModel.Player;
 import util.Instantiator;
 
 public class Launcher {
 	private File[] files;
 	private JComboBox<String> playerPicker1, playerPicker2, selectMode;
+	private JFrame launcherFrame;
+	private JLabel title;
+	private JButton submit;
+	private JPanel panel;
 
 	public static void main(String args[]) {
 		new Launcher();
@@ -46,7 +52,7 @@ public class Launcher {
 		modes.add("AI vs. AI");
 
 		// Create a combo box with list of game modes
-		selectMode = new JComboBox(modes.toArray());
+		selectMode = new JComboBox<String>(modes.toArray(new String[modes.size()]));
 
 		// Get list of AIs from the package artificalIntelligence
 		try {
@@ -62,28 +68,32 @@ public class Launcher {
 		}
 
 		// Add the names to combo boxes
-		playerPicker1 = new JComboBox(aiNames.toArray());
-		playerPicker2 = new JComboBox(aiNames.toArray());
+		playerPicker1 = new JComboBox<String>(aiNames.toArray(new String[aiNames.size()]));
+		playerPicker2 = new JComboBox<String>(aiNames.toArray(new String[aiNames.size()]));
 
 		// Create submit button
-		JButton submit = new JButton("Start");
+		submit = new JButton("Start");
 		
 		// Title
-		JLabel title = new JLabel("Chess");
+		title = new JLabel("Chess");
 		title.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
 		title.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// Create a panel add the components
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(5, 1));
+		panel = new JPanel();
+		panel.setLayout(new GridLayout(8, 1));
+		panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 		panel.add(title);
+		panel.add(new JLabel("Game Mode:"));
 		panel.add(selectMode);
+		panel.add(new JLabel("AI One:"));
 		panel.add(playerPicker1);
+		panel.add(new JLabel("AI Two:"));
 		panel.add(playerPicker2);
 		panel.add(submit);
 
 		// make a window
-		final JFrame launcherFrame = new JFrame();
+		launcherFrame = new JFrame();
 		launcherFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		launcherFrame.setResizable(false);
 		launcherFrame.setVisible(true);
@@ -91,33 +101,74 @@ public class Launcher {
 		launcherFrame.pack();
 		launcherFrame.setSize(new Dimension(200, 200));
 		launcherFrame.setLocationRelativeTo(null); // center it
-
-		submit.addActionListener(new ActionListener() {
-
+		
+		playerPicker1.setEnabled(false);
+		
+		selectMode.addActionListener(new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int gameMode = selectMode.getSelectedIndex();
-				Player p1, p2;
-				if (gameMode == Game.AI_VS_AI) {
-					File f1 = files[playerPicker1.getSelectedIndex()];
-					String className1 = "artificialIntelligence" + "."
-							+ f1.getName().substring(0, f1.getName().indexOf("."));
-					p1 = Instantiator.makeComputerPlayer(f1.getPath(), className1, 0);
-				} else {
-					p1 = new HumanPlayer("Human Player 1", 0);
+				if (e.getActionCommand().equals("comboBoxChanged")){
+					switch (selectMode.getSelectedIndex()) {
+					case 0:
+						playerPicker1.setEnabled(false);
+						playerPicker2.setEnabled(true);
+						break;
+					case 1:
+						playerPicker1.setEnabled(false);
+						playerPicker2.setEnabled(false);
+						break;
+					case 2:
+						playerPicker1.setEnabled(true);
+						playerPicker2.setEnabled(true);
+						break;
+					}
 				}
-				if (gameMode != Game.HUMAN_VS_HUMAN) {
-					File f2 = files[playerPicker2.getSelectedIndex()];
-					String className2 = "artificialIntelligence" + "."
-							+ f2.getName().substring(0, f2.getName().indexOf("."));
-					p2 = Instantiator.makeComputerPlayer(f2.getPath(), className2, 1);
-				} else {
-					p2 = new HumanPlayer("Human Player 2", 1);
-				}
-
-				new GraphicsGUI(gameMode, p1, p2);
-				launcherFrame.dispose();
 			}
 		});
+		
+		// handle submit button
+		submit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				launchGame();
+			}
+		});
+		
+		launcherFrame.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+					launchGame();
+				}
+			}			
+		});
+	}
+
+	private void launchGame() {
+		int gameMode = selectMode.getSelectedIndex();
+		Player p1, p2;
+		if (gameMode == Game.AI_VS_AI) {
+			File f1 = files[playerPicker1.getSelectedIndex()];
+			String className1 = "artificialIntelligence" + "."
+					+ f1.getName().substring(0, f1.getName().indexOf("."));
+			p1 = Instantiator.makePlayer(f1.getPath(), className1, 0);
+		} else {
+			p1 = new HumanPlayer();
+			p1.init("Human Player 1", 0);
+		}
+		if (gameMode != Game.HUMAN_VS_HUMAN) {
+			File f2 = files[playerPicker2.getSelectedIndex()];
+			String className2 = "artificialIntelligence" + "."
+					+ f2.getName().substring(0, f2.getName().indexOf("."));
+			p2 = Instantiator.makePlayer(f2.getPath(), className2, 1);
+		} else {
+			p2 = new HumanPlayer();
+			p2.init("Human Player 2", 1);
+		}
+
+		new GraphicsGUI(gameMode, p1, p2);
+		launcherFrame.dispose();
 	}
 }

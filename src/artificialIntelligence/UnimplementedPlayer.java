@@ -1,16 +1,13 @@
 package artificialIntelligence;
 
-import chessModel.*;
+import chessModel.Board;
+import chessModel.Player;
 
 /**
  * 
  * @author Roger
  */
-public class UnimplementedPlayer extends ComputerPlayer {
-	
-	public UnimplementedPlayer(int s) {
-		super("Dummy Player " + (s + 1), s);
-	}
+public class UnimplementedPlayer extends Player {
 
 	@Override
 	public Integer[] getMove(Board board) {

@@ -1,19 +1,15 @@
 package artificialIntelligence;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import chessModel.Board;
-import chessModel.ComputerPlayer;
+import chessModel.Player;
 
-public class RandomMove extends ComputerPlayer {
+public class RandomMove extends Player {
 	
 	private int delay;
-	
-	public RandomMove(int s) {
-		super("Random Player " + (s + 1), s);
-	}
 
-	@Override
 	public Integer[] getMove(Board board) {
 		ArrayList<Integer[]> allMoves = board.getAllMoves(side);
 		try {
@@ -21,8 +17,8 @@ public class RandomMove extends ComputerPlayer {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-				
-		return allMoves.get((int) (Math.random()*(allMoves.size()-1)));
+		Random random = new Random();
+		return allMoves.get(random.nextInt(allMoves.size()));
 	}
 
 }
