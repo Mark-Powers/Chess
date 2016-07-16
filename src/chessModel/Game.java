@@ -49,6 +49,8 @@ public class Game {
 
 		// -1 means nobody has won yet
 		winner = -1;
+		
+		board.setPlayerNames(player1.getName(), player2.getName());
 
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);

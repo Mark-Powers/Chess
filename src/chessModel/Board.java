@@ -144,7 +144,7 @@ public class Board {
 				numsForLog[1] = oldY;
 				numsForLog[2] = x;
 				numsForLog[3] = y;
-				movelog.addToLog(oldX, oldY, x, y,selectedP,otherP);
+				movelog.addToLog(oldX, oldY, x, y, this, selectedP,otherP);
 				return true;
 			}
 		}
@@ -539,4 +539,7 @@ public class Board {
 		}
 	}
 
+	public void setPlayerNames(String name1, String name2) {
+		movelog.setPlayerNames(name1, name2);
+	}
 }
