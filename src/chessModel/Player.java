@@ -2,19 +2,22 @@ package chessModel;
 
 public abstract class Player {
 	
-	Game game;
-	String name;
-	int side;
+	protected String name;
+	protected int side;
 	
-	public Player(Game g, String n, int s){
-		game = g;
+	public void init(String n, int s){
 		name = n;
 		side = s;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	/**
-	 * The move the game waits for.
+	 * Ask the player for a move. The game should run this on a different thread.
+	 * @param board The board in play
 	 * @return Array of two numbers, coordinates of move (fromX, fromY, toX, toY)
 	 */
-	public abstract Integer[] getMove();
+	public abstract Integer[] getMove(Board board);
 }

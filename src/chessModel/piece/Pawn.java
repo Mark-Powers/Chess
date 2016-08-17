@@ -1,4 +1,6 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
 
 public class Pawn extends Piece {
 	private boolean hasTakenFirstMove;
@@ -41,6 +43,10 @@ public class Pawn extends Piece {
 
 	public int getValue() {
 		return 1;
+	}
+	
+	public boolean hasTakenFirstMove(){
+		return hasTakenFirstMove;
 	}
 
 }

@@ -4,13 +4,17 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
 
 import chessModel.Board;
-import chessModel.Piece;
+import chessModel.piece.Piece;
+import util.ChessUtil;
 
+@SuppressWarnings("serial")
 public class ChessView extends JPanel {
 
 	private Board b;
@@ -41,6 +45,19 @@ public class ChessView extends JPanel {
 		charMap.put("p", '\u265F');
 		
 		setBackground(Color.white);
+		
+		addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() != 1){
+					int cellSize = getCellSize();
+					int xLoc = (e.getY()) / cellSize;
+					int yLoc = (e.getX()) / cellSize;
+					System.out.println(ChessUtil.convertLocation(xLoc, yLoc));
+				}
+			}
+		});
 	}
 	
 	public void setSelected(Piece p){

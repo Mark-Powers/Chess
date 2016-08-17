@@ -1,23 +1,57 @@
 package chessModel;
 
+// TODO rework this stuff, as it is Desktop specific
+// HERE --------------------------------------------------------
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
+// TO HERE -----------------------------------------------------
+
+import chessModel.piece.Piece;
+import chessViewController.HumanPlayer;
 
 public class Game {
 	private int currentSide;
+	private int gameMode;
 	private Board board;
 	private Timer side1Timer;
 	private Timer side2Timer;
 	private Time player1TimeLeft;
 	private Time player2TimeLeft;
+	Player player1, player2;
+	private Thread computeMove;
+	private int winner;
+	private Timer advanceTurnTimer;
 
-	public static final int DEFAULT_TIME = 60; // In Seconds, 3600 is one hour
+	// Game Modes
+	public static int HUMAN_VS_AI = 0;
+	public static int HUMAN_VS_HUMAN = 1;
+	public static int AI_VS_AI = 2;
 
-	public Game() {
+	public static final int DEFAULT_TIME = 60 * 45; // In Seconds, 3600 is one
+													// hour
+	public static final int MAXINVALIDMOVES = 25;
+
+	private int invalidMovesCount;
+
+	public Game(int gameMode, Player player1, Player player2) {
 		board = new Board();
+
+		this.gameMode = gameMode;
+
+		invalidMovesCount = 1;
+
+		this.player1 = player1;
+		this.player2 = player2;
+
 		currentSide = 0;
+
+		// -1 means nobody has won yet
+		winner = -1;
+		
+		board.setPlayerNames(player1.getName(), player2.getName());
+
 		player1TimeLeft = new Time(DEFAULT_TIME);
 		player2TimeLeft = new Time(DEFAULT_TIME);
 
@@ -32,11 +66,111 @@ public class Game {
 			}
 		});
 		side1Timer.start();
+
+		advanceTurnTimer = new Timer(100, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (winner != -1) {
+					advanceTurnTimer.stop();
+				}
+				if (!computeMove.isAlive()) {
+					performTurn();
+				}
+			}
+		});
+		advanceTurnTimer.start();
+
+		performTurn();
 	}
 
-	public void move(int oldX, int oldY, int x, int y) {
+	private void performTurn() {
+		if (computeMove != null) {
+			computeMove.interrupt();
+		}
+
+		if (invalidMovesCount > MAXINVALIDMOVES || isCheckMate()) {
+			winner = binaryOpposite(currentSide);
+			return;
+		}
+
+		computeMove = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// We create this sand-box, so the player does not have
+				// direct
+				// access to the game board
+				Board sandbox = new Board();
+				sandbox.populateFromFEN(board.getFEN());
+
+				// Poll the player for a move
+				Integer[] move = getCurrentPlayer().getMove(sandbox);
+
+				int oldX = move[0];
+				int oldY = move[1];
+				int newX = move[2];
+				int newY = move[3];
+
+				Piece piece = board.getPiece(move[0], move[1]);
+
+				boolean validPiece = true;
+				if (piece == null) {
+					validPiece = false;
+				} else {
+					if (piece.getSide() != currentSide) {
+						validPiece = false;
+					}
+				}
+
+				if (!validPiece) {
+					incrementInvalidMoves();
+					return;
+				}
+
+				if (!move(oldX, oldY, newX, newY)) {
+					incrementInvalidMoves();
+				} else {
+					if (invalidMovesCount != 1) {
+						System.out.println();
+					}
+					invalidMovesCount = 1;
+				}
+			}
+		});
+		computeMove.start();
+	}
+
+	public void incrementInvalidMoves() {
+		if (getCurrentPlayer() instanceof HumanPlayer) {
+			// human players aren't punished
+			return;
+		}
+		if (invalidMovesCount == 1) {
+			String playerName = getCurrentPlayer().getName();
+			System.out.print(playerName + " submitted invalid 1");
+		} else if (invalidMovesCount < MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount);
+		} else if (invalidMovesCount == MAXINVALIDMOVES) {
+			System.out.print(" " + invalidMovesCount + "\n");
+		}
+		invalidMovesCount++;
+	}
+
+	public Player getCurrentPlayer() {
+		if (currentSide == 0) {
+			return player1;
+		} else {
+			return player2;
+		}
+	}
+
+	public boolean move(int oldX, int oldY, int x, int y) {
 		Piece tmp = board.getPiece(oldX, oldY);
-		if (tmp.getSide() == currentSide && board.move(oldX, oldY, x, y)) {
+		if (tmp == null) {
+			return false;
+		}
+		boolean moveSuccess = board.move(oldX, oldY, x, y);
+		if (tmp.getSide() == currentSide && moveSuccess) {
 			if (currentSide == 0) {
 				currentSide = 1;
 				side1Timer.stop();
@@ -47,6 +181,7 @@ public class Game {
 				side1Timer.start();
 			}
 		}
+		return moveSuccess;
 	}
 
 	public Board getBoard() {
@@ -64,35 +199,61 @@ public class Game {
 	public int getCurrentSide() {
 		return currentSide;
 	}
-	public int getPlayer1Score(){
+
+	public int getPlayer1Score() {
 		return board.getWhiteScore();
 	}
-	public int getPlayer2Score(){
+
+	public int getPlayer2Score() {
 		return board.getBlackScore();
 	}
-		
+
 	/**
-	 * @param side The side that is being checked for checkmate
+	 * @param side
+	 *            The side that is being checked for checkmate
 	 * @return
 	 */
-	public boolean isCheckMate(){
-		if(!board.isInCheck(currentSide)){ // Can't be in checkmate if not in check
+	public boolean isCheckMate() {
+		if (!board.isInCheck(currentSide)) { // Can't be in checkmate if not in
+												// check
 			return false;
 		}
-		for(Integer[] move : board.getAllMoves(0)){
+		for (Integer[] move : board.getAllMoves(0)) {
 			Piece p = board.getPiece(move[0], move[1]);
-			if(board.resolvesCheck(p, move[2], move[3])){
-				return false; // If there is a move that resolves check, it is not checkmate
+			if (board.resolvesCheck(p, move[2], move[3])) {
+				return false; // If there is a move that resolves check, it is
+								// not checkmate
 			}
 		}
 		return true;
 	}
-	
+
 	/**
-	 * @param side The side that is being checked for a draw
+	 * @param side
+	 *            The side that is being checked for a draw
 	 * @return
 	 */
-	public boolean isDraw(){
-		return (board.getAllMoves(currentSide).size()==0);
+	public boolean isDraw() {
+		return (board.getAllMoves(currentSide).size() == 0);
+	}
+
+	public int getGameMode() {
+		return gameMode;
+	}
+
+	public int getWinner() {
+		return winner;
+	}
+
+	public int binaryOpposite(int num) {
+		if (num == 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	public int getInvalidMovesCount() {
+		return invalidMovesCount;
 	}
 }

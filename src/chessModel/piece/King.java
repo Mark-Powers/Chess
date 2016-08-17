@@ -1,14 +1,16 @@
-package chessModel;
+package chessModel.piece;
+
+import chessModel.SquareStatus;
 
 public class King extends Piece
 {
-	boolean canCastle;
+	boolean hasMoved;
     public King(int x, int y, int side)
     {
         this.x = x;
         this.y = y;
         this.side = side;
-        canCastle = true;
+        hasMoved = false;
     }
     public String getChar(){
         if(side==0)
@@ -19,7 +21,7 @@ public class King extends Piece
     	if(validMove(x, y, status)){
     		this.x = x;
     		this.y = y;
-    		canCastle = false;
+    		hasMoved = true;
     		return true;
     	}
     	return false;
@@ -29,5 +31,8 @@ public class King extends Piece
     }
     public int getValue(){
     	return 1000;
+    }
+    public boolean hasMoved(){
+    	return hasMoved;
     }
 }
