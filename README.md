@@ -1,7 +1,7 @@
 # Chess
 A chess program, that allows for the writing of custom AI.
 
-![Chess Screenshot](https://raw.githubusercontent.com/rogerveldman/Chess/master/chess.png)
+![Chess Screenshot](chess.png)
 
 ## Get Started
 1. Setup the source code in a IDE of  your choice.
